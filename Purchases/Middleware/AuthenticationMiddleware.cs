@@ -19,6 +19,12 @@ namespace Purchases.Middleware
 
         public async Task InvokeAsync(HttpContext context, PurchasesContext dbContext)
         {
+            if (context.Request.Path == "/api/authentication")
+            {
+                await _next(context);
+                return;
+            }
+
             var authToken = context.Request.Cookies["auth_token"];
 
             var user = dbContext.User.SingleOrDefault(u => u.AuthToken == authToken);
