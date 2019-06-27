@@ -26,11 +26,15 @@ namespace Purchases.Middleware
             }
 
             var authToken = context.Request.Cookies["auth_token"];
+            if (authToken == null)
+            {
+                authToken = context.Request.Headers["auth_token"];
+            }
 
             var user = dbContext.User.SingleOrDefault(u => u.AuthToken == authToken);
             if (user == null)
             {
-                throw new AuthenticationException("The authentication token is invalid");
+                throw new AuthenticationException($"The authentication token ({authToken}) is invalid");
             }
 
             if (user.AuthExpire < DateTime.Now)
