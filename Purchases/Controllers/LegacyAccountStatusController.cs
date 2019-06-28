@@ -1,4 +1,5 @@
 ﻿using Business.Repositories;
+using Legacy.LegacyFormatting;
 using Legacy.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
@@ -23,7 +24,7 @@ namespace Purchases.Controllers
 
             var mapper = new AccountStatusMapper();
 
-            return mapper.Map(accountStatuses);
+            return mapper.Map(accountStatuses).AddLegacyFormatting();
         }
     }
 }

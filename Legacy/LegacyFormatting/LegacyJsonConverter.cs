@@ -31,7 +31,7 @@ namespace Legacy.LegacyFormatting
                     if (propVal != null)
                     {
                         var name = prop.Name.ToUnderscoreCase();
-                        var valt = prop.PropertyType.Equals(typeof(int))
+                        var valt = prop.PropertyType.Equals(typeof(int)) || prop.PropertyType.Equals(typeof(decimal)) || prop.PropertyType.Equals(typeof(Double))
                             ? propVal.ToString()
                             : propVal;
                         var val = JToken.FromObject(valt, serializer);
