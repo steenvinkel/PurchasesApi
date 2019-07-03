@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Business.Repositories;
 using Business.Services;
 using DataAccess.Models;
 using DataAccess.Repositories;
+using Legacy.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Purchases.Controllers;
 using Purchases.Helpers;
 using Purchases.Middleware;
 
@@ -43,6 +37,7 @@ namespace Purchases
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountStatusRepository, AccountStatusRepository>();
+            services.AddScoped<ILegacyPostingRepository, LegacyPostingRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
