@@ -21,6 +21,7 @@ namespace DataAccess.Repositories
                            join subcategory in _context.Subcategory
                                on posting.SubcategoryId equals subcategory.SubcategoryId
                            where posting.UserId == userId
+                           orderby posting.CreatedOn descending
                            select new { posting, Description = subcategory.Name };
 
             return postings.Select(p => new LegacyPosting
