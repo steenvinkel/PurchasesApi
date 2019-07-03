@@ -1,8 +1,10 @@
 ﻿using DataAccess.Models;
 using Legacy.Models;
 using Legacy.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 
 namespace DataAccess.Repositories
 {
@@ -17,12 +19,13 @@ namespace DataAccess.Repositories
 
         public List<LegacyPosting> Get(int userId)
         {
-            var postings = from posting in _context.Posting
+            var postings = (from posting in _context.Posting
                            join subcategory in _context.Subcategory
                                on posting.SubcategoryId equals subcategory.SubcategoryId
                            where posting.UserId == userId
                            orderby posting.CreatedOn descending
-                           select new { posting, Description = subcategory.Name };
+                           select new { posting, Description = subcategory.Name }
+                           ).ToList();
 
             return postings.Select(p => new LegacyPosting
             {
