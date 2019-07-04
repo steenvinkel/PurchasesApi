@@ -1,5 +1,6 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Purchases.Helpers;
 using System;
 using System.Linq;
@@ -11,26 +12,44 @@ namespace Purchases.Middleware
     public class CustomAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly IMemoryCache _cache;
 
-        public CustomAuthenticationMiddleware(RequestDelegate next)
+        public CustomAuthenticationMiddleware(RequestDelegate next, IMemoryCache cache)
         {
             _next = next;
+            _cache = cache;
         }
 
         public async Task InvokeAsync(HttpContext context, PurchasesContext dbContext)
         {
-            if (context.Request.Path == "/api/authentication")
+            if (IsAuthenticationController(context))
             {
                 await _next(context);
                 return;
             }
 
-            var authToken = context.Request.Cookies["auth_token"];
-            if (authToken == null)
+            string authToken = context.GetAuthToken();
+
+            if (!_cache.TryGetValue(authToken, out int userId))
             {
-                authToken = context.Request.Headers["auth_token"];
+                DateTime expiration;
+                (userId, expiration) = GetUserIdAndExpiration(dbContext, authToken);
+
+                _cache.Set(authToken, userId, expiration);
             }
 
+            context.SetUserId(userId);
+
+            await _next(context);
+        }
+
+        private static bool IsAuthenticationController(HttpContext context)
+        {
+            return context.Request.Path == "/api/authentication";
+        }
+
+        private Tuple<int, DateTime> GetUserIdAndExpiration(PurchasesContext dbContext, string authToken)
+        {
             var user = dbContext.User.SingleOrDefault(u => u.AuthToken == authToken);
             if (user == null)
             {
@@ -42,9 +61,7 @@ namespace Purchases.Middleware
                 throw new AuthenticationException("Authentication token has expired");
             }
 
-            context.Items.Add(HttpContextItemNames.UserId, user.UserId);
-
-            await _next(context);
+            return Tuple.Create(user.UserId, user.AuthExpire);
         }
     }
 }
