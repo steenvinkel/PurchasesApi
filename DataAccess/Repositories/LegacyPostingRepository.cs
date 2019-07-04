@@ -25,7 +25,7 @@ namespace DataAccess.Repositories
                            where posting.UserId == userId
                            orderby posting.CreatedOn descending
                            select new { posting, Description = subcategory.Name }
-                           ).ToList();
+                           ).Take(200).ToList();
 
             return postings.Select(p => new LegacyPosting
             {
