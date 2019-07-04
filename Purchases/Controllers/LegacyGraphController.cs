@@ -19,6 +19,32 @@ namespace Purchases.Controllers
             _context = context;
         }
 
+        [HttpGet("SumPerDay")]
+        public ActionResult SumPerDay()
+        {
+            var userId = HttpContext.GetUserId();
+            var sums = from posting in _context.Posting
+                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
+                       where category.Type == "out" && category.CategoryId != 15
+                       group posting by new { posting.Date.Year, posting.Date.Month } into g
+                       select new
+                       {
+                           g.Key.Year,
+                           g.Key.Month,
+                           Sum = g.Sum(x => x.Amount)
+                       };
+
+            var sumPerDay = sums.ToList().Select(sum => new
+            {
+                Year = sum.Year.ToString(),
+                Month = sum.Month.ToString(),
+                SumPerDay = Math.Round(sum.Sum / DateTime.DaysInMonth(sum.Year, sum.Month), 2)
+            });
+
+            return Ok(sumPerDay);
+        }
+
         [HttpGet("MonthlyAccountStatus")]
         public ActionResult Get()
         {
@@ -46,7 +72,6 @@ namespace Purchases.Controllers
                     c.Name
                 })
             });
-
 
             return Ok(new
             {
