@@ -19,6 +19,30 @@ namespace Purchases.Controllers
             _context = context;
         }
 
+        [HttpGet("NumDailyPurchases")]
+        public ActionResult NumDailyPurchases()
+        {
+            var userId = HttpContext.GetUserId();
+
+            var dailyPurcases = 
+                (from posting in _context.Posting
+                join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                join category in _context.Category on subcategory.CategoryId equals category.CategoryId
+                where posting.UserId == userId && category.Type == "out"
+                group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
+                select new
+                {
+                    g.Key.Year,
+                    g.Key.Month,
+                    g.Key.Day,
+                    Num = g.Count()
+                }).ToList();
+
+            dailyPurcases.RemoveAll(p => p.Year == 2014 && p.Month < 9);
+
+            return Ok(dailyPurcases);
+        }
+
         [HttpGet("SumPerDay")]
         public ActionResult SumPerDay()
         {
@@ -26,7 +50,7 @@ namespace Purchases.Controllers
             var sums = from posting in _context.Posting
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == "out" && category.CategoryId != 15
+                       where category.Type == "out" && category.CategoryId != 15 && posting.UserId == userId
                        group posting by new { posting.Date.Year, posting.Date.Month } into g
                        select new
                        {
