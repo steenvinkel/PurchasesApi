@@ -1,4 +1,5 @@
-﻿using DataAccess.Models;
+﻿using Business.Services;
+using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Purchases.Helpers;
@@ -20,7 +21,7 @@ namespace Purchases.Middleware
             _cache = cache;
         }
 
-        public async Task InvokeAsync(HttpContext context, PurchasesContext dbContext)
+        public async Task InvokeAsync(HttpContext context, IAuthenticationService authenticationService)
         {
             if (IsAuthenticationController(context))
             {
@@ -33,7 +34,7 @@ namespace Purchases.Middleware
             if (!_cache.TryGetValue(authToken, out int userId))
             {
                 DateTime expiration;
-                (userId, expiration) = GetUserIdAndExpiration(dbContext, authToken);
+                (userId, expiration) = authenticationService.GetUserIdAndExpiration(authToken);
 
                 _cache.Set(authToken, userId, expiration);
             }
@@ -46,22 +47,6 @@ namespace Purchases.Middleware
         private static bool IsAuthenticationController(HttpContext context)
         {
             return context.Request.Path == "/api/authentication";
-        }
-
-        private Tuple<int, DateTime> GetUserIdAndExpiration(PurchasesContext dbContext, string authToken)
-        {
-            var user = dbContext.User.SingleOrDefault(u => u.AuthToken == authToken);
-            if (user == null)
-            {
-                throw new AuthenticationException($"The authentication token ({authToken}) is invalid");
-            }
-
-            if (user.AuthExpire < DateTime.Now)
-            {
-                throw new AuthenticationException("Authentication token has expired");
-            }
-
-            return Tuple.Create(user.UserId, user.AuthExpire);
         }
     }
 }

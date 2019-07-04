@@ -27,7 +27,7 @@ namespace Purchases
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();  
+            services.AddMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvc(config => {
                 config.Filters.Add(new LegacyActionFilter());
@@ -39,6 +39,8 @@ namespace Purchases
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountStatusRepository, AccountStatusRepository>();
             services.AddScoped<ILegacyPostingRepository, LegacyPostingRepository>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
