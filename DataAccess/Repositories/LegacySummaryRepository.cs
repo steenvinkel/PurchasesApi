@@ -32,6 +32,8 @@ namespace DataAccess.Repositories
                 })
                 .ToList();
 
+            var subCategoriesMap = subCategories.GroupBy(x => x.Category_id).ToDictionary(x => x.Key);
+
             var summary =
                 (from posting in _context.Posting
                  join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
@@ -56,7 +58,7 @@ namespace DataAccess.Repositories
                     )
                 );
 
-            return (categories, subCategories, summaryMap);
+            return (categories, subCategoriesMap, summaryMap);
         }
     }
 }
