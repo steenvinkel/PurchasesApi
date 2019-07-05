@@ -46,7 +46,7 @@ namespace Purchases.Middleware
 
         private static bool IsAuthenticationController(HttpContext context)
         {
-            return context.Request.Path == "/api/authentication";
+            return context.Request.Path.ToString().Contains("/api/authentication");
         }
     }
 }
