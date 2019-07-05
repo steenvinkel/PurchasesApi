@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purchases", "Purchases\Purchases.csproj", "{4893D216-679C-49E0-A034-35D44F77D421}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Purchases", "Purchases\Purchases.csproj", "{4893D216-679C-49E0-A034-35D44F77D421}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{43CF6229-CFC0-498C-AA27-11FAE26CC7BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{43CF6229-CFC0-498C-AA27-11FAE26CC7BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Business.csproj", "{CA779E0C-2B4A-4511-87CB-AF122EA0E8D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Business.csproj", "{CA779E0C-2B4A-4511-87CB-AF122EA0E8D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Tests", "Business.Tests\Business.Tests.csproj", "{6DD366B4-B5BA-4316-9ABB-3CBD0F46C0AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.Tests", "Business.Tests\Business.Tests.csproj", "{6DD366B4-B5BA-4316-9ABB-3CBD0F46C0AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Legacy", "Legacy\Legacy.csproj", "{F4D228AB-90BA-4E81-AB19-E3E4970D271A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Legacy", "Legacy\Legacy.csproj", "{F4D228AB-90BA-4E81-AB19-E3E4970D271A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Legacy.Tests", "Legacy.Tests\Legacy.Tests.csproj", "{C7790973-C724-4088-8032-07428E92890E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Legacy.Tests", "Legacy.Tests\Legacy.Tests.csproj", "{C7790973-C724-4088-8032-07428E92890E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purchases.IntegrationTests", "Purchases.IntegrationTests\Purchases.IntegrationTests.csproj", "{22D745F7-D3BE-4A7E-936C-062E6DC3B939}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{C7790973-C724-4088-8032-07428E92890E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7790973-C724-4088-8032-07428E92890E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7790973-C724-4088-8032-07428E92890E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22D745F7-D3BE-4A7E-936C-062E6DC3B939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22D745F7-D3BE-4A7E-936C-062E6DC3B939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22D745F7-D3BE-4A7E-936C-062E6DC3B939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22D745F7-D3BE-4A7E-936C-062E6DC3B939}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

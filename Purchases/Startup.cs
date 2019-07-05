@@ -4,6 +4,7 @@ using Business.Services;
 using DataAccess.Models;
 using DataAccess.Repositories;
 using Legacy.Repositories;
+using Legacy.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,10 @@ namespace Purchases
             services.AddScoped<ILegacyPostingRepository, LegacyPostingRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ILegacySumupRepository, LegacySumupRepository>();
+            services.AddScoped<ILegacySumupService, LegacySumupService>();
+            services.AddScoped<ILegacySummaryRepository, LegacySummaryRepository>();
+            services.AddScoped<ILegacyMonthlyAccountStatusRepository, LegacyMonthlyAccountStatusRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
