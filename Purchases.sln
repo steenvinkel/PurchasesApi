@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Legacy", "Legacy\Legacy.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Legacy.Tests", "Legacy.Tests\Legacy.Tests.csproj", "{C7790973-C724-4088-8032-07428E92890E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Purchases.IntegrationTests", "Purchases.IntegrationTests\Purchases.IntegrationTests.csproj", "{22D745F7-D3BE-4A7E-936C-062E6DC3B939}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{22D745F7-D3BE-4A7E-936C-062E6DC3B939}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
