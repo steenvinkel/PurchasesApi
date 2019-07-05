@@ -18,7 +18,7 @@ namespace DataAccess.Repositories
         {
             var categories = _context.Category
                 .Where(c => c.UserId == userId)
-                .Select(c => new { c.Name, CategoryId = c.CategoryId.ToString() })
+                .Select(c => new { c.Name, Category_id = c.CategoryId.ToString() })
                 .ToList();
 
             var subCategories = _context.Subcategory
@@ -27,8 +27,8 @@ namespace DataAccess.Repositories
                 .Select(pair => new
                 {
                     pair.s.Name,
-                    SubcategoryId = pair.s.SubcategoryId.ToString(),
-                    CategoryId = pair.s.CategoryId.ToString(),
+                    Subcategory_id = pair.s.SubcategoryId.ToString(),
+                    Category_id = pair.s.CategoryId.ToString(),
                 })
                 .ToList();
 
