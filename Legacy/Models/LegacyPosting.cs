@@ -4,7 +4,7 @@ namespace Legacy.Models
 {
     public class LegacyPosting
     {
-        public int PostingId { get; set; }
+        public int Posting_id { get; set; }
         public double Amount { get; set; }
         public DateTime Date { get; set; }
         public string Description { get; set; }
