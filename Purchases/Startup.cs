@@ -29,6 +29,14 @@ namespace Purchases
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CORSPolicy", builder => builder
+                    .WithOrigins("http://euve10292.server4you.net", "https://euve10292.server4you.net")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                );
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvc(config => {
                 config.Filters.Add(new LegacyActionFilter());
@@ -61,6 +69,8 @@ namespace Purchases
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors("CORSPolicy");
 
             app.UseHttpsRedirection();
             app.UseMiddleware<CustomAuthenticationMiddleware>();
