@@ -9,7 +9,7 @@ namespace Legacy.Mappers
     {
         public object Map(List<AccountStatus> accountStatuses)
         {
-            var legacyAccountStatuses = accountStatuses.Select(accountStatus => new LegacyAccountStatuses(
+            var legacyAccountStatuses = accountStatuses.Select(accountStatus => new LegacyAccountStatus(
                 accountStatus.AccountId,
                 accountStatus.AccountStatusId,
                 accountStatus.Amount,
