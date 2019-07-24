@@ -15,7 +15,8 @@ namespace Purchases.IntegrationTests
     public class CustomWebApplicationFactory<TStartup>
     : WebApplicationFactory<TStartup> where TStartup : class
     {
-        public string AuthToken { get; set; }
+        public string AuthToken { get; private set; }
+        public string SubCategoryName { get; private set; }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -66,6 +67,7 @@ namespace Purchases.IntegrationTests
                         var subcategory = fixture.Create<Subcategory>();
                         subcategory.CategoryId = category.CategoryId;
                         db.Subcategory.Add(subcategory);
+                        SubCategoryName = subcategory.Name;
 
                         var posting = fixture.Create<Posting>();
                         posting.Amount = 10000;

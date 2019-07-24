@@ -14,25 +14,12 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public (object, object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId)
+        public (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId)
         {
             var categories = _context.Category
                 .Where(c => c.UserId == userId)
                 .Select(c => new { c.Name, Category_id = c.CategoryId.ToString() })
                 .ToList();
-
-            var subCategories = _context.Subcategory
-                .Join(_context.Category, s => s.CategoryId, c => c.CategoryId, (s, c) => new { s, c.UserId })
-                .Where(r => r.UserId == userId)
-                .Select(pair => new
-                {
-                    pair.s.Name,
-                    Subcategory_id = pair.s.SubcategoryId.ToString(),
-                    Category_id = pair.s.CategoryId.ToString(),
-                })
-                .ToList();
-
-            var subCategoriesMap = subCategories.GroupBy(x => x.Category_id).ToDictionary(x => x.Key);
 
             var summary =
                 (from posting in _context.Posting
@@ -58,7 +45,7 @@ namespace DataAccess.Repositories
                     )
                 );
 
-            return (categories, subCategoriesMap, summaryMap);
+            return (categories, summaryMap);
         }
     }
 }

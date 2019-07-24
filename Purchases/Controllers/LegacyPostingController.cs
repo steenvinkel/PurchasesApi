@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
 using System;
+using System.Collections.Generic;
 
 namespace Purchases.Controllers
 {
@@ -20,14 +21,14 @@ namespace Purchases.Controllers
         }
 
         [HttpGet]
-        public ActionResult Get()
+        public ActionResult<List<LegacyPosting>> Get()
         {
             var postings = _postingRepository.Get(HttpContext.GetUserId());
-            return postings.AddLegacyFormatting();
+            return Ok(postings);
         }
 
         [HttpPut]
-        public ActionResult Put(LegacyPosting posting)
+        public ActionResult<LegacyPosting> Put(LegacyPosting posting)
         {
             ValidatePosting(posting);
 
@@ -38,7 +39,7 @@ namespace Purchases.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post(LegacyPosting posting)
+        public ActionResult<LegacyPosting> Post(LegacyPosting posting)
         {
             if (posting.Posting_id != 0)
             {
@@ -49,7 +50,7 @@ namespace Purchases.Controllers
             var userId = HttpContext.GetUserId();
             var newPosting = _postingRepository.Post(posting, userId);
 
-            return Ok(newPosting).AddLegacyFormatting();
+            return Ok(newPosting);
         }
 
         private static void ValidatePosting(LegacyPosting posting)

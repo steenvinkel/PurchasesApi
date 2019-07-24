@@ -1,4 +1,5 @@
-﻿using DataAccess.Models;
+﻿using Business.Customizations;
+using DataAccess.Models;
 using Legacy.Models;
 using Legacy.Repositories;
 using System;
@@ -18,6 +19,12 @@ namespace DataAccess.Repositories
 
         public List<MonthlyTypeSum> Sumup(int userId)
         {
+            var taxCategoryId = 0;
+            if (Rules.IsJcpSpecific(userId))
+            {
+                taxCategoryId = 15;
+            }
+
             var inAndOut = (from p in _context.Posting
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
@@ -44,7 +51,7 @@ namespace DataAccess.Repositories
             var tax = (from p in _context.Posting
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
-                       where p.UserId == userId && c.Type == "out" && c.CategoryId == 15
+                       where p.UserId == userId && c.Type == "out" && c.CategoryId == taxCategoryId
                        group p.Amount by new { p.Date.Year, p.Date.Month } into g
                        select new
                        {

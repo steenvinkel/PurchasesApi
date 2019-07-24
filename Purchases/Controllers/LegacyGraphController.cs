@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Business.Repositories;
 using DataAccess.Models;
+using Legacy.Models;
 using Legacy.Repositories;
 using Legacy.Services;
 using Microsoft.AspNetCore.Http;
@@ -14,17 +16,19 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacyGraphController : ControllerBase
     {
-        private readonly PurchasesContext _context;
         private readonly ILegacySumupService _sumupService;
         private readonly ILegacySummaryRepository _summaryRepository;
         private readonly ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private readonly ILegacyGraphRepository _graphRepository;
+        private readonly ISubCategoryRepository _subCategoryRepository;
 
-        public LegacyGraphController(PurchasesContext context, ILegacySumupService sumupService, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository)
+        public LegacyGraphController(ILegacySumupService sumupService, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository, ILegacyGraphRepository graphRepository, ISubCategoryRepository subCategoryRepository)
         {
-            _context = context;
             _sumupService = sumupService;
             _summaryRepository = summaryRepository;
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
+            _graphRepository = graphRepository;
+            _subCategoryRepository = subCategoryRepository;
         }
 
         [HttpGet("Sumup")]
@@ -42,7 +46,12 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var (categories, subcategories, summary) = _summaryRepository.Summary(userId);
+            var subcategories = _subCategoryRepository.GetList(userId)
+                .Select(sc => new { sc.Name, Subcategories_id = sc.Id, Categories_id = sc.CategoryId } )
+                .GroupBy(x => x.Categories_id)
+                .ToDictionary(x => x.Key);
+
+            var (categories, summary) = _summaryRepository.Summary(userId);
 
             return Ok(new
             {
@@ -57,47 +66,17 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var dailyPurcases = 
-                (from posting in _context.Posting
-                join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                where posting.UserId == userId && category.Type == "out"
-                group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
-                select new
-                {
-                    g.Key.Year,
-                    g.Key.Month,
-                    g.Key.Day,
-                    Num = g.Count()
-                }).ToList();
+            var dailyPurchases = _graphRepository.GetDailyPurchases(userId);
 
-            dailyPurcases.RemoveAll(p => p.Year == 2014 && p.Month < 9);
-
-            return Ok(dailyPurcases);
+            return Ok(dailyPurchases);
         }
 
         [HttpGet("SumPerDay")]
         public ActionResult SumPerDay()
         {
             var userId = HttpContext.GetUserId();
-            var sums = from posting in _context.Posting
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == "out" && category.CategoryId != 15 && posting.UserId == userId
-                       group posting by new { posting.Date.Year, posting.Date.Month } into g
-                       select new
-                       {
-                           g.Key.Year,
-                           g.Key.Month,
-                           Sum = g.Sum(x => x.Amount)
-                       };
 
-            var sumPerDay = sums.ToList().Select(sum => new
-            {
-                Year = sum.Year.ToString(),
-                Month = sum.Month.ToString(),
-                SumPerDay = Math.Round(sum.Sum / DateTime.DaysInMonth(sum.Year, sum.Month), 2)
-            });
+            var sumPerDay = _graphRepository.GetMonthlyAverageDailyPurchases(userId);
 
             return Ok(sumPerDay);
         }
@@ -112,7 +91,7 @@ namespace Purchases.Controllers
             return Ok(new
             {
                 Categories = categories,
-                status = status
+                status
             });
         }
 
@@ -121,41 +100,9 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var inTypes =
-                       from posting in _context.Posting
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == "in"
-                            && posting.Date.Year == year && posting.Date.Month == month
-                       group new { posting, category, subcategory } by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId } into g
-                       select new {
-                           Year = g.Key.Year.ToString(),
-                           Month = g.Key.Month.ToString(),
-                           g.First().category.Type,
-                           g.First().subcategory.Name,
-                           g.First().subcategory.Color,
-                           Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                       };
+            var monthlyStatuses = _graphRepository.GetMonthlyStatus(userId, year, month);
 
-            var outTypes =
-                       from posting in _context.Posting
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == "out"
-                            && posting.Date.Year == year && posting.Date.Month == month
-                       group new { posting, category } by new { posting.Date.Year, posting.Date.Month, category.CategoryId } into g
-                       select new {
-                           Year = g.Key.Year.ToString(),
-                           Month = g.Key.Month.ToString(),
-                           g.First().category.Type,
-                           g.First().category.Name,
-                           g.First().category.Color,
-                           Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                       };
-
-            var result = inTypes.Union(outTypes).ToList();
-
-            return Ok(result);
+            return Ok(monthlyStatuses);
         }
     }
 }

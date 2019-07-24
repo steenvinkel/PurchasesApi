@@ -4,7 +4,6 @@ using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
 
 namespace DataAccess.Repositories
 {
@@ -21,10 +20,11 @@ namespace DataAccess.Repositories
         {
             var postings = (from posting in _context.Posting
                            join subcategory in _context.Subcategory
-                               on posting.SubcategoryId equals subcategory.SubcategoryId
+                               on posting.SubcategoryId equals subcategory.SubcategoryId into ps
+                           from sub in ps.DefaultIfEmpty()
                            where posting.UserId == userId
                            orderby posting.CreatedOn descending
-                           select new { posting, Description = subcategory.Name }
+                           select new { posting, Description = sub.Name  }
                            ).Take(200).ToList();
 
             return postings.Select(p => new LegacyPosting
@@ -35,7 +35,7 @@ namespace DataAccess.Repositories
                 Latitude = p.posting.Latitude,
                 Longitude = p.posting.Longitude,
                 Accuracy = p.posting.Accuracy,
-                Description = p.Description
+                Description = p.Description ?? p.posting.Description
             }).ToList();
         }
 
@@ -70,7 +70,7 @@ namespace DataAccess.Repositories
             {
                 Amount = posting.Amount,
                 Description = subcategoryId == null ? posting.Description : null,
-                Date = posting.Date,
+                Date = posting.Date.Date,
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
                 Accuracy = posting.Accuracy,
@@ -91,7 +91,7 @@ namespace DataAccess.Repositories
             {
                 Posting_id = posting.PostingId,
                 Amount = posting.Amount,
-                Date = posting.Date,
+                Date = posting.Date.Date,
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
                 Accuracy = posting.Accuracy,

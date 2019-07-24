@@ -1,4 +1,6 @@
-﻿using Legacy.Repositories;
+﻿using Business.Models;
+using Legacy.Models;
+using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,7 @@ namespace Legacy.Services
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
         }
 
-        public List<dynamic> Sumup(int userId)
+        public List<LegacyMonthlySumup> Sumup(int userId)
         {
             var monthlyResults = _sumupRepository.Sumup(userId)
                 .OrderBy(x => x.Year).ThenBy(x => x.Month).ThenBy(x => x.Type).ToList();
@@ -26,12 +28,12 @@ namespace Legacy.Services
             // The first month is always useless since it only contains the account status
             monthlyResults.RemoveFirstMonthInFirstYear();
 
-            var (_, __, summary) = _summaryRepository.Summary(userId);
+            var (_, summary) = _summaryRepository.Summary(userId);
 
-            Dictionary<(int, int), double> summedFortunes = _monthlyAccountStatusRepository.CalculateSummedFortunes(userId);
+            Dictionary<MonthAndYear, double> summedFortunes = _monthlyAccountStatusRepository.CalculateSummedFortunes(userId);
 
             var monthlyValues = new Dictionary<(int, int), (double pureInWithoutPension, double pureOut)>();
-            var monthly = new List<dynamic>();
+            var monthly = new List<LegacyMonthlySumup>();
             foreach (var yearData in monthlyResults.GroupBy(x => x.Year))
             {
                 var year = yearData.Key;
@@ -56,35 +58,33 @@ namespace Legacy.Services
 
                     monthlyValues.Add((year, month), (pureInWithoutPension, pureOut));
 
-                    var savingProcentage = CalculateSavingsRate(pureIn, pureOut);
-                    var savingsWithoutPension = CalculateSavingsRate(pureInWithoutPension, pureOut);
+                    var savingProcentage = Math.Round(CalculateSavingsRate(pureIn, pureOut), 2);
+                    var savingsWithoutPension = Math.Round(CalculateSavingsRate(pureInWithoutPension, pureOut), 2);
                     var savingsLastYear = SavingsRateLastYear(year, month, monthlyValues);
 
-                    var expensesLastYear = AverageExpensesLastYear(year, month, monthlyValues);
-                    var monthsWithoutPay = GetMonthsLivableWithoutPay(year, month, summedFortunes, expensesLastYear);
+                    var expensesLastYear = AverageExpensesLastYear(new MonthAndYear(year, month), monthlyValues);
+                    var monthsWithoutPay = GetMonthsLivableWithoutPay(new MonthAndYear(year, month), summedFortunes, expensesLastYear);
 
-
-                    monthly.Add(new
+                    monthly.Add(new LegacyMonthlySumup
                     {
-                        year,
-                        month,
-                        In = (double)@in,
-                        Out = (double)@out,
-                        pureOut = (double)pureOut,
-                        invest = (double)invest,
-                        savings = (double)savingProcentage,
-                        savingsWithoutOwnContribution = (double)savingsWithoutPension,
-                        savingsLastYear = (double)savingsLastYear,
-                        expensesLastYear = (double)expensesLastYear,
-                        monthsWithoutPay = (double)monthsWithoutPay,
-                        extra = (double)extra,
+                        Year = year,
+                        Month = month,
+                        In = @in,
+                        Out = @out,
+                        pureOut = pureOut,
+                        invest = invest,
+                        savings = savingProcentage,
+                        savingsWithoutOwnContribution = savingsWithoutPension,
+                        savingsLastYear = savingsLastYear,
+                        expensesLastYear = expensesLastYear,
+                        monthsWithoutPay = monthsWithoutPay,
+                        extra = extra,
                     });
                 }
             }
 
             return monthly;
         }
-
 
         private static double CreateExtraLine(int userId, int year, int month, double @in, double tax)
         {
@@ -114,48 +114,47 @@ namespace Legacy.Services
             return extra;
         }
 
-        private (int, int) GetLastMonth(int year, int month)
+        private double GetMonthsLivableWithoutPay(MonthAndYear monthAndYear, Dictionary<MonthAndYear, double> summedFortune, double expensesLastYear)
         {
-            var lastMonth = month - 1;
-
-            return (lastMonth == 0 ? year - 1 : year, lastMonth == 0 ? 12 : lastMonth);
-        }
-
-
-        private double GetMonthsLivableWithoutPay(int year, int month, Dictionary<(int, int), double> summedFortune, double expensesLastYear)
-        {
-            var lastPeriod = GetLastMonth(year, month);
+            var lastMonth = monthAndYear.PreviousMonth();
             return expensesLastYear == 0
                 ? 0
-                : summedFortune[lastPeriod] / expensesLastYear;
+                : summedFortune[lastMonth] / expensesLastYear;
         }
 
-        private double AverageExpensesLastYear(int year, int month, Dictionary<(int, int), (double pureInWithoutPension, double pureOut)> monthlyValues)
+        private double AverageExpensesLastYear(MonthAndYear month, Dictionary<(int, int), (double pureInWithoutPension, double pureOut)> monthlyValues)
         {
             var count = 0;
             var sumOut = 0.0;
-            var currentMonth = month - 1;
-            var currentYear = year;
-            for (int i = 0; i < 12; i++) {
-                if (currentMonth == 0) {
-                    currentMonth = 12;
-                    currentYear -= 1;
-                }
 
-                if (monthlyValues.ContainsKey((currentYear, currentMonth)))
+            var months = GetAllMonthsLastYear(month);
+            foreach (var current in months)
+            {
+                if (monthlyValues.ContainsKey((current.Year, current.Month)))
                 {
-                    var values = monthlyValues[(currentYear, currentMonth)];
-                    var @out = values.pureOut;
+                    var (_, pureOut) = monthlyValues[(current.Year, current.Month)];
+                    var @out = pureOut;
                     sumOut += @out;
                     count += 1;
                 }
-  
-                currentMonth -= 1;
             }
 
             return count == 0
                 ? 0
                 : sumOut / count;
+        }
+
+        private List<MonthAndYear> GetAllMonthsLastYear(MonthAndYear monthAndYear)
+        {
+            var months = new List<MonthAndYear>();
+            var current = monthAndYear;
+            for (int i = 0; i < 12; i++)
+            {
+                current = current.PreviousMonth();
+                months.Add(current);
+            }
+
+            return months;
         }
 
         private double SavingsRateLastYear(int year, int month, Dictionary<(int, int), (double pureInWithoutPension, double pureOut)> monthlyValues)
@@ -172,9 +171,9 @@ namespace Legacy.Services
 
                 if (monthlyValues.ContainsKey((currentYear, currentMonth)))
                 {
-                    var values = monthlyValues[(currentYear, currentMonth)];
-                    var @in = values.pureInWithoutPension;
-                    var @out = values.pureOut;
+                    var (pureInWithoutPension, pureOut) = monthlyValues[(currentYear, currentMonth)];
+                    var @in = pureInWithoutPension;
+                    var @out = pureOut;
                     sumIn += @in;
                     sumOut += @out;
                 }
@@ -189,35 +188,35 @@ namespace Legacy.Services
         {
             return @in <= 0
                 ? 0
-                : (@in - @out) / @in *100;
+                : (@in - @out) / @in * 100;
         }
-
 
         private double GetSelfPaidPension(Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>> summary, int year, int month)
         {
-            if (year < 2016 || (month <= 9 && year == 2016)) {
-                return 0;
-            }
             if (summary.ContainsKey(2)
                 && summary[2].ContainsKey(2)
                 && summary[2][2].ContainsKey(year)
                 && summary[2][2][year].ContainsKey(month)
                 )
             {
-
-                var pay = summary[2][2][year][month];
-  
-                var pensionRate = 0.0625;
-                if (year < 2018 || (month <= 7 && year == 2018)) {
-                    pensionRate = 0.0525;
-                }
-                var pension = Math.Round(pay * pensionRate, 2);
-
-                return pension;
+                return CalculatePension(year, month, summary[2][2][year][month]);
             }
 
             return 0;
         }
 
+        private double CalculatePension(int year, int month, double pay)
+        {
+            var pensionRate = 0.0625;
+            if (year < 2018 || (month <= 7 && year == 2018)) {
+                pensionRate = 0.0525;
+            }
+            if (year < 2016 || (month <= 9 && year == 2016)) {
+                return 0;
+            }
+            var pension = Math.Round(pay * pensionRate, 2);
+
+            return pension;
+        }
     }
 }

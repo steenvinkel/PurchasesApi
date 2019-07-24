@@ -1,4 +1,5 @@
-﻿using DataAccess.Models;
+﻿using Business.Models;
+using DataAccess.Models;
 using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
@@ -44,10 +45,10 @@ namespace DataAccess.Repositories
             return (categories, status);
         }
 
-        public Dictionary<(int, int), double> CalculateSummedFortunes(int userId)
+        public Dictionary<MonthAndYear, double> CalculateSummedFortunes(int userId)
         {
             var (_, monthlyAccountStatuses) = MonthlyAccountStatus(userId);
-            var summedFortunes = new Dictionary<(int, int), double>();
+            var summedFortunes = new Dictionary<MonthAndYear, double>();
             foreach (var status in monthlyAccountStatuses)
             {
                 var amount = 0.0;
@@ -59,7 +60,7 @@ namespace DataAccess.Repositories
                         amount += category.Amount;
                     }
                 }
-                summedFortunes.Add(((int)status.Year, (int)status.Month), amount);
+                summedFortunes.Add(new MonthAndYear((int)status.Year, (int)status.Month), amount);
             }
 
             return summedFortunes;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Business.Repositories;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +12,21 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacySubCategoryController : ControllerBase
     {
-        private readonly PurchasesContext _context;
+        private readonly ISubCategoryRepository _subCategoryRepository;
 
-        public LegacySubCategoryController(PurchasesContext context)
+        public LegacySubCategoryController(ISubCategoryRepository subCategoryRepository)
         {
-            _context = context;
+            _subCategoryRepository = subCategoryRepository;
         }
 
         [HttpGet]
         public ActionResult<List<string>> Get()
         {
             var userId = HttpContext.GetUserId();
-            var subcategoryNames = from subcategory in _context.Subcategory
-                                   join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                                   where category.UserId == userId
-                                   select subcategory.Name;
+
+            var subcategories = _subCategoryRepository.GetList(userId);
+
+            var subcategoryNames = subcategories.Select(s => s.Name).ToList();
 
             return Ok(subcategoryNames);
         }

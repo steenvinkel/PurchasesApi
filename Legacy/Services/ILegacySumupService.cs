@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Legacy.Models;
+using System.Collections.Generic;
 
 namespace Legacy.Services
 {
     public interface ILegacySumupService
     {
-        List<object> Sumup(int userId);
+        List<LegacyMonthlySumup> Sumup(int userId);
     }
 }

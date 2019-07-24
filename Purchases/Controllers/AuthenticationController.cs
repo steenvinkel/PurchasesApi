@@ -35,5 +35,13 @@ namespace Purchases.Controllers
 
             return Ok();
         }
+
+        [HttpPost("ValidateToken")]
+        public ActionResult PostValidateToken([FromBody] string authToken)
+        {
+            _authenticationService.GetUserIdAndExpiration(authToken);
+
+            return Ok();
+        }
     }
 }
