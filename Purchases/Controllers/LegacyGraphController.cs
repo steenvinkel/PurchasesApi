@@ -47,8 +47,8 @@ namespace Purchases.Controllers
             var userId = HttpContext.GetUserId();
 
             var subcategories = _subCategoryRepository.GetList(userId)
-                .Select(sc => new { sc.Name, Subcategories_id = sc.Id, Categories_id = sc.CategoryId } )
-                .GroupBy(x => x.Categories_id)
+                .Select(sc => new { sc.Name, Subcategory_id = sc.Id, Category_id = sc.CategoryId } )
+                .GroupBy(x => x.Category_id)
                 .ToDictionary(x => x.Key);
 
             var (categories, summary) = _summaryRepository.Summary(userId);
