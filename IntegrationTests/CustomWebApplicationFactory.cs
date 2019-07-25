@@ -81,6 +81,18 @@ namespace Purchases.IntegrationTests
                         posting2.UserId = user.UserId;
                         db.Posting.Add(posting2);
 
+                        var accountStatus = fixture.Create<AccountStatus>();
+                        accountStatus.Date = posting.Date;
+                        accountStatus.Amount = 10000;
+                        accountStatus.UserId = user.UserId;
+                        db.AccountStatus.Add(accountStatus);
+
+                        var accountStatus2 = fixture.Create<AccountStatus>();
+                        accountStatus2.Date = posting2.Date;
+                        accountStatus2.Amount = 10000;
+                        accountStatus2.UserId = user.UserId;
+                        db.AccountStatus.Add(accountStatus2);
+
                         db.SaveChanges();
                     }
                     catch (Exception ex)

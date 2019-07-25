@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Business.Models;
+using Business.Repositories;
 using Legacy.Models;
 using Legacy.Repositories;
 using Legacy.Services;
@@ -19,6 +20,7 @@ namespace Legacy.Tests.Services
         private ILegacySumupRepository _sumupRepository;
         private ILegacySummaryRepository _summaryRepository;
         private ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private IAccountStatusRepository _accountStatusRepository;
 
         [SetUp]
         public void SetUp()
@@ -27,6 +29,7 @@ namespace Legacy.Tests.Services
             _sumupRepository = _fixture.Freeze<ILegacySumupRepository>();
             _summaryRepository = _fixture.Freeze<ILegacySummaryRepository>();
             _monthlyAccountStatusRepository = _fixture.Freeze<ILegacyMonthlyAccountStatusRepository>();
+            _accountStatusRepository = _fixture.Freeze<IAccountStatusRepository>();
         }
 
         [Test]
@@ -36,7 +39,6 @@ namespace Legacy.Tests.Services
 
             var monthlyTypeSums = new List<MonthlyTypeSum>
             {
-                new MonthlyTypeSum { Year = 2019, Month = 5, Type = "in", Sum = 10000 },
                 new MonthlyTypeSum { Year = 2019, Month = 6, Type = "in", Sum = 25000 },
                 new MonthlyTypeSum { Year = 2019, Month = 6, Type = "out", Sum = 20000 },
                 new MonthlyTypeSum { Year = 2019, Month = 6, Type = "tax", Sum = 10000 },
@@ -59,6 +61,14 @@ namespace Legacy.Tests.Services
             var summedFortunes = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 5000 } };
             Mock.Get(_monthlyAccountStatusRepository).Setup(x => x.CalculateSummedFortunes(userId))
                 .Returns(summedFortunes);
+
+            var accountStatuses = new List<AccountStatus> {
+                CreateAccountStatus(0, 2019, 5),
+                CreateAccountStatus(5000, 2019, 6),
+                CreateAccountStatus(10000, 2019, 7),
+            };
+            Mock.Get(_accountStatusRepository).Setup(x => x.Get(userId))
+                .Returns(accountStatuses);
 
             var sut = _fixture.Create<LegacySumupService>();
 
@@ -87,8 +97,14 @@ namespace Legacy.Tests.Services
             //Assert.AreEqual(0, monthlySumup.savingsLastYear);
             //Assert.AreEqual(0, monthlySumup.expensesLastYear);
             //Assert.AreEqual(17500, monthlySumup.extra);
-            //Assert.AreEqual(0, monthlySumup.monthsWithoutPay);
+            Assert.AreEqual(0.5, monthlySumup.MonthsWithoutPay);
             //Assert.AreEqual(25.58, monthlySumup.savingsWithoutOwnContribution);
+        }
+
+        private AccountStatus CreateAccountStatus(int amount, int year, int month)
+        {
+            var monthAndYear = new MonthAndYear(year, month);
+            return new AccountStatus(_fixture.Create<int>(), _fixture.Create<int>(), monthAndYear.LastDayOfMonth(), amount);
         }
     }
 }

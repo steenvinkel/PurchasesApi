@@ -33,17 +33,6 @@ namespace DataAccess.Repositories
                            Sum = Math.Round(g.Sum(), 2)
                        }).ToList();
 
-            var invest = (
-                from a in _context.AccountStatus
-                group a.Amount by new { a.Date.Year, a.Date.Month } into g
-                select new
-                {
-                    g.Key.Year,
-                    g.Key.Month,
-                    Type = "invest",
-                    Sum = Math.Round(g.Sum() * 0.02 / 12, 2)
-                }).ToList();
-
             var tax = (from p in _context.Posting
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
@@ -58,7 +47,7 @@ namespace DataAccess.Repositories
                        }
                 ).ToList();
 
-            return inAndOut.Union(tax).Union(invest).Select(x => new MonthlyTypeSum
+            return inAndOut.Union(tax).Select(x => new MonthlyTypeSum
             {
                 Year = x.Year,
                 Month = x.Month,

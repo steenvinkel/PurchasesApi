@@ -1,4 +1,5 @@
 ﻿using Business.Models;
+using Business.Repositories;
 using Legacy.Models;
 using Legacy.Repositories;
 using System;
@@ -12,25 +13,45 @@ namespace Legacy.Services
         private readonly ILegacySumupRepository _sumupRepository;
         private readonly ILegacySummaryRepository _summaryRepository;
         private readonly ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private readonly IAccountStatusRepository _accountStatusRepository;
 
-        public LegacySumupService(ILegacySumupRepository sumupRepository, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository)
+        public LegacySumupService(ILegacySumupRepository sumupRepository, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository, IAccountStatusRepository accountStatusRepository)
         {
             _sumupRepository = sumupRepository;
             _summaryRepository = summaryRepository;
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
+            _accountStatusRepository = accountStatusRepository;
         }
 
         public List<LegacyMonthlySumup> Sumup(int userId)
         {
+            var sumup = SumupPostings(userId);
+
+            var monthlyInvestmentMap = _accountStatusRepository.Get(userId)
+                .GroupBy(accountStatus => new MonthAndYear(accountStatus.Date.Year, accountStatus.Date.Month), x => x.Amount)
+                .ToDictionary(x => x.Key, x => Math.Round(x.Sum() * 0.02 / 12, 2));
+
+            Dictionary<MonthAndYear, double> summedFortunes = _monthlyAccountStatusRepository.CalculateSummedFortunes(userId);
+
+            foreach(var monthlySumup in sumup)
+            {
+                var monthAndYear = new MonthAndYear(monthlySumup.Year, monthlySumup.Month);
+                var monthlyInvestment = monthlyInvestmentMap[monthAndYear];
+                monthlySumup.Invest = monthlyInvestment;
+
+                var monthsWithoutPay = GetMonthsLivableWithoutPay(monthAndYear, summedFortunes, monthlySumup.ExpensesLastYear);
+                monthlySumup.MonthsWithoutPay = monthsWithoutPay;
+            }
+
+            return sumup;
+        }
+
+        private List<LegacyMonthlySumup> SumupPostings(int userId)
+        {
             var monthlyResults = _sumupRepository.Sumup(userId)
                 .OrderBy(x => x.Year).ThenBy(x => x.Month).ThenBy(x => x.Type).ToList();
 
-            // The first month is always useless since it only contains the account status
-            monthlyResults.RemoveFirstMonthInFirstYear();
-
             var (_, summary) = _summaryRepository.Summary(userId);
-
-            Dictionary<MonthAndYear, double> summedFortunes = _monthlyAccountStatusRepository.CalculateSummedFortunes(userId);
 
             var monthlyValues = new Dictionary<(int, int), (double pureInWithoutPension, double pureOut)>();
             var monthly = new List<LegacyMonthlySumup>();
@@ -40,9 +61,10 @@ namespace Legacy.Services
                 foreach (var data in yearData.GroupBy(x => x.Month))
                 {
                     var month = data.Key;
+                    var monthAndYear = new MonthAndYear(year, month);
+
                     var @in = data.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0;
                     var @out = data.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0;
-                    var invest = data.SingleOrDefault(x => x.Type == "invest")?.Sum ?? 0;
                     var tax = data.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0;
 
                     double extra = CreateExtraLine(userId, year, month, @in, tax);
@@ -62,8 +84,7 @@ namespace Legacy.Services
                     var savingsWithoutPension = Math.Round(CalculateSavingsRate(pureInWithoutPension, pureOut), 2);
                     var savingsLastYear = SavingsRateLastYear(year, month, monthlyValues);
 
-                    var expensesLastYear = AverageExpensesLastYear(new MonthAndYear(year, month), monthlyValues);
-                    var monthsWithoutPay = GetMonthsLivableWithoutPay(new MonthAndYear(year, month), summedFortunes, expensesLastYear);
+                    var expensesLastYear = AverageExpensesLastYear(monthAndYear, monthlyValues);
 
                     monthly.Add(new LegacyMonthlySumup
                     {
@@ -72,12 +93,10 @@ namespace Legacy.Services
                         In = @in,
                         Out = @out,
                         PureOut = pureOut,
-                        Invest = invest,
                         Savings = savingProcentage,
                         SavingsWithoutOwnContribution = savingsWithoutPension,
                         SavingsLastYear = savingsLastYear,
                         ExpensesLastYear = expensesLastYear,
-                        MonthsWithoutPay = monthsWithoutPay,
                         Extra = extra,
                     });
                 }
