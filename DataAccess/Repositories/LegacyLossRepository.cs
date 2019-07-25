@@ -32,6 +32,7 @@ namespace DataAccess.Repositories
             }
 
             lossPosting.Amount = loss;
+            lossPosting.CreatedOn = DateTime.Now;
 
             _context.SaveChanges();
         }
@@ -47,7 +48,6 @@ namespace DataAccess.Repositories
                 Latitude = null,
                 Longitude = null,
                 Accuracy = null,
-                CreatedOn = DateTime.Now,
             };
         }
 
