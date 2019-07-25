@@ -37,10 +37,10 @@ namespace Legacy.Services
             {
                 var monthAndYear = new MonthAndYear(monthlySumup.Year, monthlySumup.Month);
                 var monthlyInvestment = monthlyInvestmentMap[monthAndYear];
-                monthlySumup.Invest = monthlyInvestment;
+                monthlySumup.Invest = Math.Round(monthlyInvestment, 2);
 
                 var monthsWithoutPay = GetMonthsLivableWithoutPay(monthAndYear, summedFortunes, monthlySumup.ExpensesLastYear);
-                monthlySumup.MonthsWithoutPay = monthsWithoutPay;
+                monthlySumup.MonthsWithoutPay = Math.Round(monthsWithoutPay, 2);
             }
 
             return sumup;
@@ -80,8 +80,8 @@ namespace Legacy.Services
 
                     monthlyValues.Add((year, month), (pureInWithoutPension, pureOut));
 
-                    var savingProcentage = Math.Round(CalculateSavingsRate(pureIn, pureOut), 2);
-                    var savingsWithoutPension = Math.Round(CalculateSavingsRate(pureInWithoutPension, pureOut), 2);
+                    var savingProcentage = CalculateSavingsRate(pureIn, pureOut);
+                    var savingsWithoutPension = CalculateSavingsRate(pureInWithoutPension, pureOut);
                     var savingsLastYear = SavingsRateLastYear(year, month, monthlyValues);
 
                     var expensesLastYear = AverageExpensesLastYear(monthAndYear, monthlyValues);
@@ -90,14 +90,14 @@ namespace Legacy.Services
                     {
                         Year = year,
                         Month = month,
-                        In = @in,
-                        Out = @out,
-                        PureOut = pureOut,
-                        Savings = savingProcentage,
-                        SavingsWithoutOwnContribution = savingsWithoutPension,
-                        SavingsLastYear = savingsLastYear,
-                        ExpensesLastYear = expensesLastYear,
-                        Extra = extra,
+                        In = Math.Round(@in, 2),
+                        Out = Math.Round(@out, 2),
+                        PureOut = Math.Round(pureOut, 2),
+                        Savings = Math.Round(savingProcentage, 2),
+                        SavingsWithoutOwnContribution = Math.Round(savingsWithoutPension, 2),
+                        SavingsLastYear = Math.Round(savingsLastYear, 2),
+                        ExpensesLastYear = Math.Round(expensesLastYear, 2),
+                        Extra = Math.Round(extra, 2),
                     });
                 }
             }

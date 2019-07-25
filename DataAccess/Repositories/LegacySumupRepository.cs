@@ -30,7 +30,7 @@ namespace DataAccess.Repositories
                            g.Key.Year,
                            g.Key.Month,
                            g.Key.Type,
-                           Sum = Math.Round(g.Sum(), 2)
+                           Sum = g.Sum()
                        }).ToList();
 
             var tax = (from p in _context.Posting
@@ -43,7 +43,7 @@ namespace DataAccess.Repositories
                            g.Key.Year,
                            g.Key.Month,
                            Type = "tax",
-                           Sum = Math.Round(g.Sum(), 2)
+                           Sum = g.Sum()
                        }
                 ).ToList();
 
