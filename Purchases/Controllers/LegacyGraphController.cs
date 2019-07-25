@@ -16,11 +16,16 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacyGraphController : ControllerBase
     {
-        private readonly ILegacySumupService _sumupService;
-        private readonly ILegacySummaryRepository _summaryRepository;
+        // Accounts
         private readonly ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
-        private readonly ILegacyGraphRepository _graphRepository;
+
+        // Postings
         private readonly ISubCategoryRepository _subCategoryRepository;
+        private readonly ILegacySummaryRepository _summaryRepository;
+        private readonly ILegacyGraphRepository _graphRepository;
+
+        // Mixed
+        private readonly ILegacySumupService _sumupService;
 
         public LegacyGraphController(ILegacySumupService sumupService, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository, ILegacyGraphRepository graphRepository, ISubCategoryRepository subCategoryRepository)
         {

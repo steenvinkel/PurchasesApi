@@ -6,13 +6,13 @@
         public int Month { get; set; }
         public double In { get; set; }
         public double Out { get; set; }
-        public double pureOut { get; set; }
-        public double invest { get; set; }
-        public double savings { get; set; }
-        public double savingsWithoutOwnContribution { get; set; }
-        public double savingsLastYear { get; set; }
-        public double expensesLastYear { get; set; }
-        public double monthsWithoutPay { get; set; }
-        public double extra { get; set; }
+        public double PureOut { get; set; }
+        public double Invest { get; set; }
+        public double Savings { get; set; }
+        public double SavingsWithoutOwnContribution { get; set; }
+        public double SavingsLastYear { get; set; }
+        public double ExpensesLastYear { get; set; }
+        public double MonthsWithoutPay { get; set; }
+        public double Extra { get; set; }
     }
 }

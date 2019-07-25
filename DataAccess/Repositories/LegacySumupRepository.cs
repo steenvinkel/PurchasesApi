@@ -19,11 +19,7 @@ namespace DataAccess.Repositories
 
         public List<MonthlyTypeSum> Sumup(int userId)
         {
-            var taxCategoryId = 0;
-            if (Rules.IsJcpSpecific(userId))
-            {
-                taxCategoryId = 15;
-            }
+            var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
 
             var inAndOut = (from p in _context.Posting
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId

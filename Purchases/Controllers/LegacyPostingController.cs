@@ -63,7 +63,7 @@ namespace Purchases.Controllers
             {
                 throw new ArgumentOutOfRangeException(nameof(posting.Description));
             }
-            if (posting.Date == default(DateTime))
+            if (posting.Date == new DateTime())
             {
                 throw new ArgumentOutOfRangeException(nameof(posting.Date));
             }

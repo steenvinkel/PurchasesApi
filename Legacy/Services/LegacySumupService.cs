@@ -71,14 +71,14 @@ namespace Legacy.Services
                         Month = month,
                         In = @in,
                         Out = @out,
-                        pureOut = pureOut,
-                        invest = invest,
-                        savings = savingProcentage,
-                        savingsWithoutOwnContribution = savingsWithoutPension,
-                        savingsLastYear = savingsLastYear,
-                        expensesLastYear = expensesLastYear,
-                        monthsWithoutPay = monthsWithoutPay,
-                        extra = extra,
+                        PureOut = pureOut,
+                        Invest = invest,
+                        Savings = savingProcentage,
+                        SavingsWithoutOwnContribution = savingsWithoutPension,
+                        SavingsLastYear = savingsLastYear,
+                        ExpensesLastYear = expensesLastYear,
+                        MonthsWithoutPay = monthsWithoutPay,
+                        Extra = extra,
                     });
                 }
             }

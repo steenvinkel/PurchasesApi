@@ -49,12 +49,7 @@ namespace DataAccess.Repositories
 
         public List<LegacyMonthlySumPerDay> GetMonthlyAverageDailyPurchases(int userId)
         {
-            var taxCategoryId = 0;
-            if (Rules.IsJcpSpecific(userId))
-            {
-                taxCategoryId = 15;
-            }
-
+            var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
 
             var sums = from posting in _context.Posting
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
