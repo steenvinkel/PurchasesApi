@@ -27,6 +27,11 @@ namespace Business.Models
             return Year < other.Year || (Month <= other.Month && Year == other.Year);
         }
 
+        public DateTime LastDayOfMonth()
+        {
+            return new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
+        }
+
         public override bool Equals(object obj)
         {
             return obj is MonthAndYear year &&

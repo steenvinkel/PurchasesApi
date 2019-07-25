@@ -1,12 +1,15 @@
-﻿using Business.Repositories;
+﻿using Business.Models;
+using Business.Repositories;
 using Legacy.LegacyFormatting;
 using Legacy.Mappers;
 using Legacy.Models;
 using Legacy.Repositories;
+using Legacy.Services;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Purchases.Controllers
 {
@@ -16,11 +19,13 @@ namespace Purchases.Controllers
     {
         private readonly IAccountStatusRepository _accountStatusRepository;
         private readonly ILegacyAccountStatusRepository _legacyAccountStatusRepository;
+        private readonly ILegacyLossService _lossService;
 
-        public LegacyAccountStatusController(IAccountStatusRepository accountStatusRepository, ILegacyAccountStatusRepository legacyAccountStatusRepository)
+        public LegacyAccountStatusController(IAccountStatusRepository accountStatusRepository, ILegacyAccountStatusRepository legacyAccountStatusRepository, ILegacyLossService lossService)
         {
             _accountStatusRepository = accountStatusRepository;
             _legacyAccountStatusRepository = legacyAccountStatusRepository;
+            _lossService = lossService;
         }
 
         [HttpGet]
@@ -36,11 +41,15 @@ namespace Purchases.Controllers
         [HttpPost]
         public ActionResult Post(List<LegacyAccountStatus> accountStatuses)
         {
+            ValidateNotEmpty(accountStatuses);
             accountStatuses.ForEach(ValidatePost);
 
             var userId = HttpContext.GetUserId();
 
             var newAccountStatuses = _legacyAccountStatusRepository.Post(accountStatuses, userId);
+
+            var monthAndYear = new MonthAndYear(accountStatuses.First().Year, accountStatuses.First().Month);
+            _lossService.CalculateLoss(userId, monthAndYear);
 
             return Ok(newAccountStatuses);
         }
@@ -48,12 +57,24 @@ namespace Purchases.Controllers
         [HttpPut]
         public ActionResult Put(List<LegacyAccountStatus> accountStatuses)
         {
+            ValidateNotEmpty(accountStatuses);
             accountStatuses.ForEach(ValidatePut);
             var userId = HttpContext.GetUserId();
 
             var existingAccountStatuses = _legacyAccountStatusRepository.Put(accountStatuses, userId);
 
+            var monthAndYear = new MonthAndYear(accountStatuses.First().Year, accountStatuses.First().Month);
+            _lossService.CalculateLoss(userId, monthAndYear);
+
             return Ok(existingAccountStatuses);
+        }
+
+        private static void ValidateNotEmpty(List<LegacyAccountStatus> accountStatuses)
+        {
+            if (accountStatuses.Count == 0)
+            {
+                throw new ArgumentException(nameof(accountStatuses) + " was empty");
+            }
         }
 
         private void ValidatePut(LegacyAccountStatus accountStatus)

@@ -1,7 +1,6 @@
 ﻿using DataAccess.Models;
 using Legacy.Models;
 using Legacy.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +36,6 @@ namespace DataAccess.Repositories
             }
             _context.SaveChanges();
 
-            var year = accountStatuses.First().Year;
-            var month = accountStatuses.First().Month;
-            CalculateLoss(userId, year, month);
-
             return newAccountStatuses.Select(Map).ToList();
         }
         public List<LegacyAccountStatus> Put(List<LegacyAccountStatus> accountStatuses, int userId)
@@ -50,6 +45,12 @@ namespace DataAccess.Repositories
                 .Where(x => ids.Contains(x.AccountStatusId))
                 .Where(x=> x.UserId == userId)
                 .ToList();
+
+            if (existingAccountStatuses.Count != accountStatuses.Count)
+            {
+                throw new Exception("Could not find all the specified AccountStatusIds");
+            }
+
             var accountStatusMap = accountStatuses.ToDictionary(x => x.Account_status_id);
             foreach(var existingAccountStatus in existingAccountStatuses)
             {
@@ -61,16 +62,7 @@ namespace DataAccess.Repositories
             }
             _context.SaveChanges();
 
-            var year = accountStatuses.First().Year;
-            var month = accountStatuses.First().Month;
-            CalculateLoss(userId, year, month);
-
             return existingAccountStatuses.Select(Map).ToList();
-        }
-
-        private void CalculateLoss(int userId, int year, int month)
-        {
-            _context.Database.ExecuteSqlCommand($"call calculate_loss_month({userId},{year},{month})");
         }
 
         private LegacyAccountStatus Map(AccountStatus accountStatus)
