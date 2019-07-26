@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Business.Models;
 
 namespace Business.Customizations
 {
@@ -15,6 +16,11 @@ namespace Business.Customizations
             }
 
             return taxCategoryId;
+        }
+
+        public static bool ShouldDailyPurchaseMonthBeRemoved(MonthAndYear monthAndYear, int userId)
+        {
+            return Rules.IsJcpSpecific(userId) && monthAndYear.IsEarlierThan(new MonthAndYear(2014, 9));
         }
     }
 }

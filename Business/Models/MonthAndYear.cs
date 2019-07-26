@@ -31,7 +31,7 @@ namespace Business.Models
 
         public bool IsEarlierThan(MonthAndYear other)
         {
-            return Year < other.Year || (Month <= other.Month && Year == other.Year);
+            return Year < other.Year || (Month < other.Month && Year == other.Year);
         }
 
         public DateTime LastDayOfMonth()

@@ -1,4 +1,6 @@
-﻿using Business.Customizations;
+﻿using Business.Constants;
+using Business.Customizations;
+using Business.Models;
 using DataAccess.Models;
 using Legacy.Models;
 using Legacy.Repositories;
@@ -23,28 +25,26 @@ namespace DataAccess.Repositories
                 (from posting in _context.Posting
                 join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                 join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                where posting.UserId == userId && category.Type == "out"
-                group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
+                where posting.UserId == userId && category.Type == CategoryProperties.Type.Out
+                 group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
                 select new
                 {
                     g.Key.Year,
                     g.Key.Month,
                     g.Key.Day,
                     Num = g.Count()
+                }).ToList().Select(dp => new LegacyDailyNum
+                {
+                    Year = dp.Year,
+                    Month = dp.Month,
+                    Day = dp.Day,
+                    NumPurchases = dp.Num
                 }).ToList();
 
-            if (Rules.IsJcpSpecific(userId))
-            {
-                dailyPurchases.RemoveAll(p => p.Year == 2014 && p.Month < 9);
-            }
 
-            return dailyPurchases.Select(dp => new LegacyDailyNum
-            {
-                Year = dp.Year,
-                Month = dp.Month,
-                Day = dp.Day,
-                NumPurchases = dp.Num
-            }).ToList();
+            dailyPurchases.RemoveAll(p => UserSpecifics.ShouldDailyPurchaseMonthBeRemoved(new MonthAndYear(p.Year, p.Month), userId));
+
+            return dailyPurchases.ToList();
         }
 
         public List<LegacyMonthlySumPerDay> GetMonthlyAverageDailyPurchases(int userId)
@@ -54,7 +54,7 @@ namespace DataAccess.Repositories
             var sums = from posting in _context.Posting
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == "out" && category.CategoryId != taxCategoryId && posting.UserId == userId
+                       where category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId && posting.UserId == userId
                        group posting by new { posting.Date.Year, posting.Date.Month } into g
                        select new
                        {
@@ -79,7 +79,7 @@ namespace DataAccess.Repositories
                        from posting in _context.Posting
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == "in"
+                       where posting.UserId == userId && category.Type == CategoryProperties.Type.In
                             && posting.Date.Year == year && posting.Date.Month == month
                        group new { posting, category, subcategory } by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId } into g
                        select new {
@@ -95,7 +95,7 @@ namespace DataAccess.Repositories
                        from posting in _context.Posting
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == "out"
+                       where posting.UserId == userId && category.Type == CategoryProperties.Type.Out
                             && posting.Date.Year == year && posting.Date.Month == month
                        group new { posting, category } by new { posting.Date.Year, posting.Date.Month, category.CategoryId } into g
                        select new {
@@ -140,7 +140,7 @@ namespace DataAccess.Repositories
             var tax = (from p in _context.Posting
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
-                       where p.UserId == userId && c.Type == "out" && c.CategoryId == taxCategoryId
+                       where p.UserId == userId && c.Type == CategoryProperties.Type.Out && c.CategoryId == taxCategoryId
                        group p.Amount by new { p.Date.Year, p.Date.Month } into g
                        select new
                        {

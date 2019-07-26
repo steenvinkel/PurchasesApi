@@ -1,4 +1,5 @@
-﻿using Business.Models;
+﻿using Business.Constants;
+using Business.Models;
 using DataAccess.Models;
 using Legacy.Repositories;
 using System;
@@ -9,9 +10,6 @@ namespace DataAccess.Repositories
 {
     public class LegacyLossRepository : ILegacyLossRepository
     {
-        private const string CategoryIncomeType = "in";
-        private const string CategoryLossName = "Tab";
-
         private readonly PurchasesContext _context;
 
         public LegacyLossRepository(PurchasesContext context)
@@ -65,7 +63,7 @@ namespace DataAccess.Repositories
         {
             return (from S in _context.Subcategory
                     join C in _context.Category on S.CategoryId equals C.CategoryId
-                    where C.Name == CategoryLossName && C.UserId == userId
+                    where C.Name == CategoryProperties.Name.Loss && C.UserId == userId
                     select S.SubcategoryId).Single();
         }
 
@@ -83,8 +81,8 @@ namespace DataAccess.Repositories
                                 where P.UserId == userId
                                     && P.Date.Year == monthAndYear.Year
                                     && P.Date.Month == monthAndYear.Month
-                                    && C.Name != CategoryLossName
-                                select C.Type == CategoryIncomeType ? P.Amount : -P.Amount)
+                                    && C.Name != CategoryProperties.Name.Loss
+                                select C.Type == CategoryProperties.Type.In ? P.Amount : -P.Amount)
                                 .Sum();
 
             var endSum = monthlyAccountStatuses[monthAndYear];
