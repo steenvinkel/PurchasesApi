@@ -30,6 +30,8 @@ namespace Legacy.Tests.Services
             _summaryRepository = _fixture.Freeze<ILegacySummaryRepository>();
             _monthlyAccountStatusRepository = _fixture.Freeze<ILegacyMonthlyAccountStatusRepository>();
             _accountStatusRepository = _fixture.Freeze<IAccountStatusRepository>();
+            _fixture.Inject<ILegacyAccountStatusSumupService>(_fixture.Create<LegacyAccountStatusSumupService>());
+            _fixture.Inject<ILegacyPostingSumupService>(_fixture.Create<LegacyPostingSumupService>());
         }
 
         [Test]
@@ -58,7 +60,7 @@ namespace Legacy.Tests.Services
             Mock.Get(_summaryRepository).Setup(x => x.Summary(userId))
                 .Returns((null, summary));
 
-            var summedFortunes = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 5000 } };
+            var summedFortunes = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 5000 }, { new MonthAndYear(2019, 5), 0 }  };
             Mock.Get(_monthlyAccountStatusRepository).Setup(x => x.CalculateSummedFortunes(userId))
                 .Returns(summedFortunes);
 

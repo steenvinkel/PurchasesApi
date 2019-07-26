@@ -24,6 +24,7 @@ namespace Purchases.IntegrationTests
         }
 
         [Test]
+        [Ignore("This might not be needed with the full test is available")]
         public async Task Sumup_ShouldReturnOk()
         {
             var result = await _client.GetAsync("/api/LegacyGraph/Sumup");
@@ -31,6 +32,7 @@ namespace Purchases.IntegrationTests
         }
 
         [Test]
+        [Ignore("This might not be needed with the full test is available")]
         public async Task Sumup_ShouldEmptyList()
         {
             var result = await _client.GetAsync("/api/LegacyGraph/Sumup");

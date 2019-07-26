@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Business.Models
 {
-    public class MonthAndYear
+    public class MonthAndYear : IComparable<MonthAndYear>
     {
         public int Year { get; }
         public int Month { get; }
@@ -20,6 +20,13 @@ namespace Business.Models
             var lastMonth = Month - 1;
 
             return new MonthAndYear(lastMonth == 0 ? Year - 1 : Year, lastMonth == 0 ? 12 : lastMonth);
+        }
+
+        public MonthAndYear NextMonth()
+        {
+            var nextMonth = Month + 1;
+
+            return new MonthAndYear(nextMonth == 13 ? Year + 1 : Year, nextMonth == 13 ? 1 : nextMonth);
         }
 
         public bool IsEarlierThan(MonthAndYear other)
@@ -42,6 +49,16 @@ namespace Business.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(Year, Month);
+        }
+
+        public int CompareTo(MonthAndYear other)
+        {
+            if (Equals(other))
+            {
+                return 0;
+            }
+
+            return IsEarlierThan(other) ? -1 : 1;
         }
     }
 }
