@@ -1,4 +1,5 @@
-﻿using Business.Models;
+﻿using Business.Customizations;
+using Business.Models;
 using Legacy.Models;
 using Legacy.Repositories;
 using System;
@@ -37,11 +38,12 @@ namespace Legacy.Services
                     var @out = data.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0;
                     var tax = data.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0;
 
-                    double extra = CreateExtraLine(userId, year, month, @in, tax);
+                    double extra = UserSpecifics.CreateExtraLine(userId, year, month, @in, tax);
 
                     var pureIn = @in - tax;
                     var pureOut = @out - tax;
-                    var selfPaidPension = GetSelfPaidPension(summary, year, month);
+                    var pensionRate = UserSpecifics.GetPensionRate(userId, monthAndYear);
+                    var selfPaidPension = GetSelfPaidPension(summary, year, month, pensionRate);
                     var pureInWithoutPension = @in - selfPaidPension - tax;
                     if (pureInWithoutPension < 0)
                     {
@@ -73,34 +75,6 @@ namespace Legacy.Services
             }
 
             return monthly;
-        }
-
-        private static double CreateExtraLine(int userId, int year, int month, double @in, double tax)
-        {
-            var extra = 0.0;
-            if (userId == 1)
-            {
-                var procent50 = 19590.0;
-                if (year > 2015 || (month > 6 && year == 2015))
-                {
-                    procent50 = 16800.0 + 10600;
-                }
-                if (year > 2016 || (month > 9 && year == 2016))
-                {
-                    procent50 = 19200.0 + 13900;
-                }
-                if (year > 2016 || (month > 11 && year == 2016))
-                {
-                    procent50 = 16000.0 + 26000;
-                }
-                if (year > 2017 || (month > 11 && year == 2017))
-                {
-                    procent50 = (@in - tax) / 2 + tax;
-                }
-                extra = procent50;
-            }
-
-            return extra;
         }
 
         private double AverageExpensesLastYear(MonthAndYear month, Dictionary<(int, int), (double pureInWithoutPension, double pureOut)> monthlyValues)
@@ -172,7 +146,7 @@ namespace Legacy.Services
                 : (@in - @out) / @in * 100;
         }
 
-        private double GetSelfPaidPension(Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>> summary, int year, int month)
+        private double GetSelfPaidPension(Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>> summary, int year, int month, double pensionRate)
         {
             if (summary.ContainsKey(2)
                 && summary[2].ContainsKey(2)
@@ -180,24 +154,10 @@ namespace Legacy.Services
                 && summary[2][2][year].ContainsKey(month)
                 )
             {
-                return CalculatePension(year, month, summary[2][2][year][month]);
+                return pensionRate * summary[2][2][year][month];
             }
 
             return 0;
-        }
-
-        private double CalculatePension(int year, int month, double pay)
-        {
-            var pensionRate = 0.0625;
-            if (year < 2018 || (month <= 7 && year == 2018)) {
-                pensionRate = 0.0525;
-            }
-            if (year < 2016 || (month <= 9 && year == 2016)) {
-                return 0;
-            }
-            var pension = Math.Round(pay * pensionRate, 2);
-
-            return pension;
         }
     }
 }
