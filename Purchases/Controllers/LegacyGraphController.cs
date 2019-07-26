@@ -13,22 +13,20 @@ namespace Purchases.Controllers
     public class LegacyGraphController : ControllerBase
     {
         // Accounts
-        private readonly ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private readonly ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository;
 
         // Postings
         private readonly ISubCategoryRepository _subCategoryRepository;
-        private readonly ILegacySummaryRepository _summaryRepository;
-        private readonly ILegacyGraphRepository _graphRepository;
+        private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
         // Mixed
         private readonly ILegacySumupService _sumupService;
 
-        public LegacyGraphController(ILegacySumupService sumupService, ILegacySummaryRepository summaryRepository, ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository, ILegacyGraphRepository graphRepository, ISubCategoryRepository subCategoryRepository)
+        public LegacyGraphController(ILegacySumupService sumupService, ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository, ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
         {
             _sumupService = sumupService;
-            _summaryRepository = summaryRepository;
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
-            _graphRepository = graphRepository;
+            _postingQueryRepository = graphRepository;
             _subCategoryRepository = subCategoryRepository;
         }
 
@@ -52,7 +50,7 @@ namespace Purchases.Controllers
                 .GroupBy(x => x.Category_id)
                 .ToDictionary(x => x.Key);
 
-            var (categories, summary) = _summaryRepository.Summary(userId);
+            var (categories, summary) = _postingQueryRepository.Summary(userId);
 
             return Ok(new
             {
@@ -67,7 +65,7 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var dailyPurchases = _graphRepository.GetDailyPurchases(userId);
+            var dailyPurchases = _postingQueryRepository.GetDailyPurchases(userId);
 
             return Ok(dailyPurchases);
         }
@@ -77,7 +75,7 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var sumPerDay = _graphRepository.GetMonthlyAverageDailyPurchases(userId);
+            var sumPerDay = _postingQueryRepository.GetMonthlyAverageDailyPurchases(userId);
 
             return Ok(sumPerDay);
         }
@@ -101,7 +99,7 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var monthlyStatuses = _graphRepository.GetMonthlyStatus(userId, year, month);
+            var monthlyStatuses = _postingQueryRepository.GetMonthlyStatus(userId, year, month);
 
             return Ok(monthlyStatuses);
         }

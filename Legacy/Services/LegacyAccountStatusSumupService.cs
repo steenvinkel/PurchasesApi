@@ -10,10 +10,10 @@ namespace Legacy.Services
 {
     public class LegacyAccountStatusSumupService : ILegacyAccountStatusSumupService
     {
-        private readonly ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private readonly ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository;
         private readonly IAccountStatusRepository _accountStatusRepository;
 
-        public LegacyAccountStatusSumupService(ILegacyMonthlyAccountStatusRepository monthlyAccountStatusRepository, IAccountStatusRepository accountStatusRepository)
+        public LegacyAccountStatusSumupService(ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository, IAccountStatusRepository accountStatusRepository)
         {
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
             _accountStatusRepository = accountStatusRepository;

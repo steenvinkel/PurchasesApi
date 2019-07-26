@@ -9,21 +9,19 @@ namespace Legacy.Services
 {
     public class LegacyPostingSumupService : ILegacyPostingSumupService
     {
-        private readonly ILegacySumupRepository _sumupRepository;
-        private readonly ILegacySummaryRepository _summaryRepository;
+        private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
-        public LegacyPostingSumupService(ILegacySumupRepository sumupRepository, ILegacySummaryRepository summaryRepository)
+        public LegacyPostingSumupService(ILegacyPostingQueryRepository postingQueryRepository)
         {
-            _sumupRepository = sumupRepository;
-            _summaryRepository = summaryRepository;
+            _postingQueryRepository = postingQueryRepository;
         }
 
         public List<LegacyMonthlySumup> GetSumup(int userId)
         {
-            var monthlyResults = _sumupRepository.Sumup(userId)
+            var monthlyResults = _postingQueryRepository.Sumup(userId)
                 .OrderBy(x => x.Year).ThenBy(x => x.Month).ThenBy(x => x.Type).ToList();
 
-            var (_, summary) = _summaryRepository.Summary(userId);
+            var (_, summary) = _postingQueryRepository.Summary(userId);
 
             var monthlyValues = new Dictionary<(int, int), (double pureInWithoutPension, double pureOut)>();
             var monthly = new List<LegacyMonthlySumup>();

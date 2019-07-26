@@ -17,18 +17,16 @@ namespace Legacy.Tests.Services
     public class LegacySumupServiceTests
     {
         private IFixture _fixture;
-        private ILegacySumupRepository _sumupRepository;
-        private ILegacySummaryRepository _summaryRepository;
-        private ILegacyMonthlyAccountStatusRepository _monthlyAccountStatusRepository;
+        private ILegacyPostingQueryRepository _postingQueryRepository;
+        private ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository;
         private IAccountStatusRepository _accountStatusRepository;
 
         [SetUp]
         public void SetUp()
         {
             _fixture = new Fixture().Customize(new AutoMoqCustomization { ConfigureMembers = true });
-            _sumupRepository = _fixture.Freeze<ILegacySumupRepository>();
-            _summaryRepository = _fixture.Freeze<ILegacySummaryRepository>();
-            _monthlyAccountStatusRepository = _fixture.Freeze<ILegacyMonthlyAccountStatusRepository>();
+            _postingQueryRepository = _fixture.Freeze<ILegacyPostingQueryRepository>();
+            _monthlyAccountStatusRepository = _fixture.Freeze<ILegacyAccountStatusQueryRepository>();
             _accountStatusRepository = _fixture.Freeze<IAccountStatusRepository>();
             _fixture.Inject<ILegacyAccountStatusSumupService>(_fixture.Create<LegacyAccountStatusSumupService>());
             _fixture.Inject<ILegacyPostingSumupService>(_fixture.Create<LegacyPostingSumupService>());
@@ -50,14 +48,14 @@ namespace Legacy.Tests.Services
                 new MonthlyTypeSum { Year = 2019, Month = 7, Type = "tax", Sum = 10000 },
                 new MonthlyTypeSum { Year = 2019, Month = 7, Type = "invest", Sum = 16.67 }
             };
-            Mock.Get(_sumupRepository).Setup(x => x.Sumup(userId))
+            Mock.Get(_postingQueryRepository).Setup(x => x.Sumup(userId))
                 .Returns(monthlyTypeSums);
 
             var yearMap = new Dictionary<int, Dictionary<int, double>> { {2019, new Dictionary<int, double> { { 6, 25000 } }} };
             var subMap = new Dictionary<int, Dictionary<int, Dictionary<int, double>>> { { 2, yearMap } };
             var summary = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>> { { 2, subMap } };
 
-            Mock.Get(_summaryRepository).Setup(x => x.Summary(userId))
+            Mock.Get(_postingQueryRepository).Setup(x => x.Summary(userId))
                 .Returns((null, summary));
 
             var summedFortunes = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 5000 }, { new MonthAndYear(2019, 5), 0 }  };

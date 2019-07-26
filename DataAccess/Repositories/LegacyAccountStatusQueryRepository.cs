@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DataAccess.Repositories
 {
-    public class LegacyMonthlyAccountStatusRepository : ILegacyMonthlyAccountStatusRepository
+    public class LegacyMonthlyAccountStatusRepository : ILegacyAccountStatusQueryRepository
     {
         private readonly PurchasesContext _context;
 
@@ -19,18 +19,18 @@ namespace DataAccess.Repositories
         public (dynamic, dynamic) MonthlyAccountStatus(int userId)
         {
             var categories = _context.AccumulatedCategory.Where(ac => ac.UserId == userId).Select(ac => new { Id = ac.AccumulatedCategoryId, ac.Color, ac.Name }).ToList();
-            var categoriesMap = categories.ToDictionary(c => c.Id);
 
-            var categoryStatuses = from mas in (from account in _context.Account
-                            join accountStatus in _context.AccountStatus on account.AccountId equals accountStatus.AccountId
-                            join accumulatedCategory in _context.AccumulatedCategory on account.AccumulatedCategoryId equals accumulatedCategory.AccumulatedCategoryId
-                            where account.UserId == userId
-                            select new { accountStatus.Date.Year, accountStatus.Date.Month, account.AccumulatedCategoryId, accountStatus.Amount })
-                         group mas by new { mas.Year, mas.Month, mas.AccumulatedCategoryId } into g
-                         select new { g.Key.Year, g.Key.Month, g.Key.AccumulatedCategoryId, Sum = g.Sum(x => x.Amount) }
-                            ;
+            var categoryStatuses =
+                (from mas in (from account in _context.Account
+                      join accountStatus in _context.AccountStatus on account.AccountId equals accountStatus.AccountId
+                      join accumulatedCategory in _context.AccumulatedCategory on account.AccumulatedCategoryId equals accumulatedCategory.AccumulatedCategoryId
+                      where account.UserId == userId
+                      select new { accountStatus.Date.Year, accountStatus.Date.Month, account.AccumulatedCategoryId, accountStatus.Amount })
+                 group mas by new { mas.Year, mas.Month, mas.AccumulatedCategoryId } into g
+                 select new { g.Key.Year, g.Key.Month, g.Key.AccumulatedCategoryId, Sum = g.Sum(x => x.Amount) })
+                 .ToList();
 
-            var status = categoryStatuses.ToList().GroupBy(x => new { x.Year, x.Month }).Select(x => new {
+            var status = categoryStatuses.GroupBy(x => new { x.Year, x.Month }).Select(x => new {
                 x.Key.Year,
                 x.Key.Month,
                 Sum = Math.Round(x.Sum(y => y.Sum), 2),
