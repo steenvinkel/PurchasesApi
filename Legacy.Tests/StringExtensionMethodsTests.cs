@@ -1,7 +1,7 @@
 using Legacy;
 using NUnit.Framework;
 
-namespace Tests
+namespace Legacy.Tests
 {
     public class StringExtensionMethodsTests
     {
