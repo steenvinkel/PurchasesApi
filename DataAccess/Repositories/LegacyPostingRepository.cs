@@ -18,11 +18,10 @@ namespace DataAccess.Repositories
 
         public List<LegacyPosting> Get(int userId)
         {
-            var postings = (from posting in _context.Posting
+            var postings = (from posting in _context.PostingForUser(userId)
                            join subcategory in _context.Subcategory
                                on posting.SubcategoryId equals subcategory.SubcategoryId into ps
                            from sub in ps.DefaultIfEmpty()
-                           where posting.UserId == userId
                            orderby posting.CreatedOn descending
                            select new { posting, Description = sub.Name  }
                            ).Take(200).ToList();
@@ -41,7 +40,7 @@ namespace DataAccess.Repositories
 
         public LegacyPosting Put(LegacyPosting posting, int userId)
         {
-            var existingPosting = _context.Posting.FirstOrDefault(p => p.PostingId == posting.Posting_id);
+            var existingPosting = _context.PostingForUser(userId).FirstOrDefault(p => p.PostingId == posting.Posting_id);
             if (existingPosting == null)
             {
                 throw new Exception($"Posting ({posting.Posting_id}) does not exists");

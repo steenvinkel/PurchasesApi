@@ -18,8 +18,7 @@ namespace DataAccess.Repositories
         public List<SubCategory> GetList(int userId)
         {
             var subcategories = (from subcategory in _context.Subcategory
-                                   join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                                   where category.UserId == userId
+                                   join category in _context.CategoryForUser(userId) on subcategory.CategoryId equals category.CategoryId
                                    select subcategory).ToList();
 
             return subcategories.Select(Map).ToList();

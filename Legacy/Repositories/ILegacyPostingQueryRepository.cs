@@ -14,5 +14,7 @@ namespace Legacy.Repositories
         List<MonthlyTypeSum> Sumup(int userId);
         (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId);
         Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId);
+        double GetMonthlyChange(int userId, MonthAndYear monthAndYear);
+        int GetLossSubCategoryId(int userId);
     }
 }

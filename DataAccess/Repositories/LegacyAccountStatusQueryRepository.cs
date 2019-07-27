@@ -65,5 +65,19 @@ namespace DataAccess.Repositories
 
             return summedFortunes;
         }
+
+        public (double StartSum, double EndSum) StartAndEndOfMonthAccountStatusSum(int userId, MonthAndYear monthAndYear)
+        {
+            var monthlyAccountStatuses = _context.AccountStatus
+                .Where(accountStatus => accountStatus.UserId == userId)
+                .GroupBy(accountStatus => new { accountStatus.Date.Year, accountStatus.Date.Month })
+                .Select(pair => new { pair.Key.Year, pair.Key.Month, Sum = pair.Sum(x => x.Amount) })
+                .ToDictionary(x => new MonthAndYear(x.Year, x.Month), x => x.Sum);
+
+            var endSum = monthlyAccountStatuses[monthAndYear];
+            var startSum = monthlyAccountStatuses[monthAndYear.PreviousMonth()];
+
+            return (startSum, endSum);
+        }
     }
 }

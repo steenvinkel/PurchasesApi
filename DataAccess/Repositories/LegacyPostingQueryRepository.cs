@@ -22,10 +22,10 @@ namespace DataAccess.Repositories
         public List<LegacyDailyNum> GetDailyPurchases(int userId)
         {
             var dailyPurchases = 
-                (from posting in _context.Posting
+                (from posting in _context.PostingForUser(userId)
                 join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                 join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                where posting.UserId == userId && category.Type == CategoryProperties.Type.Out
+                where category.Type == CategoryProperties.Type.Out
                  group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
                 select new
                 {
@@ -41,7 +41,6 @@ namespace DataAccess.Repositories
                     NumPurchases = dp.Num
                 }).ToList();
 
-
             dailyPurchases.RemoveAll(p => UserSpecifics.ShouldDailyPurchaseMonthBeRemoved(new MonthAndYear(p.Year, p.Month), userId));
 
             return dailyPurchases.ToList();
@@ -51,10 +50,10 @@ namespace DataAccess.Repositories
         {
             var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
 
-            var sums = from posting in _context.Posting
+            var sums = from posting in _context.PostingForUser(userId)
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId && posting.UserId == userId
+                       where category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId
                        group posting by new { posting.Date.Year, posting.Date.Month } into g
                        select new
                        {
@@ -76,10 +75,10 @@ namespace DataAccess.Repositories
         public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
         {
             var inTypes =
-                       from posting in _context.Posting
+                       from posting in _context.PostingForUser(userId)
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == CategoryProperties.Type.In
+                       where category.Type == CategoryProperties.Type.In
                             && posting.Date.Year == year && posting.Date.Month == month
                        group new { posting, category, subcategory } by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId } into g
                        select new {
@@ -92,10 +91,10 @@ namespace DataAccess.Repositories
                        };
 
             var outTypes =
-                       from posting in _context.Posting
+                       from posting in _context.PostingForUser(userId)
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where posting.UserId == userId && category.Type == CategoryProperties.Type.Out
+                       where category.Type == CategoryProperties.Type.Out
                             && posting.Date.Year == year && posting.Date.Month == month
                        group new { posting, category } by new { posting.Date.Year, posting.Date.Month, category.CategoryId } into g
                        select new {
@@ -124,10 +123,9 @@ namespace DataAccess.Repositories
         {
             var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
 
-            var inAndOut = (from p in _context.Posting
+            var inAndOut = (from p in _context.PostingForUser(userId)
                             join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                             join c in _context.Category on s.CategoryId equals c.CategoryId
-                            where p.UserId == userId
                             group p.Amount by new { p.Date.Year, p.Date.Month, c.Type } into g
                             select new
                             {
@@ -137,10 +135,10 @@ namespace DataAccess.Repositories
                                 Sum = g.Sum()
                             }).ToList();
 
-            var tax = (from p in _context.Posting
+            var tax = (from p in _context.PostingForUser(userId)
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
-                       where p.UserId == userId && c.Type == CategoryProperties.Type.Out && c.CategoryId == taxCategoryId
+                       where c.Type == CategoryProperties.Type.Out && c.CategoryId == taxCategoryId
                        group p.Amount by new { p.Date.Year, p.Date.Month } into g
                        select new
                        {
@@ -161,16 +159,14 @@ namespace DataAccess.Repositories
 
         public (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId)
         {
-            var categories = _context.Category
-                .Where(c => c.UserId == userId)
+            var categories = _context.CategoryForUser(userId)
                 .Select(c => new { c.Name, Category_id = c.CategoryId.ToString() })
                 .ToList();
 
             var summary =
-                (from posting in _context.Posting
+                (from posting in _context.PostingForUser(userId)
                  join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                  join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                 where posting.UserId == userId
                  group posting.Amount by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId, category.CategoryId } into g
                  select new {
                      g.Key.Year,
@@ -195,14 +191,33 @@ namespace DataAccess.Repositories
 
         public Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId)
         {
-            var monthlySum = _context.Posting
-                .Where(posting => posting.UserId == userId)
+            var monthlySum = _context.PostingForUser(userId)
                 .Where(posting => posting.SubcategoryId == subcategoryId)
                 .GroupBy(posting => new { posting.Date.Year, posting.Date.Month })
                 .Select(pair => new {pair.Key, Sum = pair.Sum(x => x.Amount)})
                 .ToDictionary(a => new MonthAndYear(a.Key.Year, a.Key.Month), a => a.Sum);
 
             return monthlySum;
+        }
+
+        public double GetMonthlyChange(int userId, MonthAndYear monthAndYear)
+        {
+            return (from P in _context.PostingForUser(userId)
+                    join S in _context.Subcategory on P.SubcategoryId equals S.SubcategoryId
+                    join C in _context.Category on S.CategoryId equals C.CategoryId
+                    where  P.Date.Year == monthAndYear.Year
+                        && P.Date.Month == monthAndYear.Month
+                        && C.Name != CategoryProperties.Name.Loss
+                    select C.Type == CategoryProperties.Type.In ? P.Amount : -P.Amount)
+                                .Sum();
+        }
+
+        public int GetLossSubCategoryId(int userId)
+        {
+            return (from S in _context.Subcategory
+                    join C in _context.CategoryForUser(userId) on S.CategoryId equals C.CategoryId
+                    where C.Name == CategoryProperties.Name.Loss
+                    select S.SubcategoryId).Single();
         }
     }
 }
