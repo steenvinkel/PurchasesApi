@@ -15,6 +15,11 @@ namespace Business.Models
             Month = month;
         }
 
+        public static implicit operator MonthAndYear((int Year, int Month) pair)
+        {
+            return new MonthAndYear(pair.Year, pair.Month);
+        }
+
         public MonthAndYear PreviousMonth()
         {
             var lastMonth = Month - 1;
@@ -32,6 +37,11 @@ namespace Business.Models
         public bool IsEarlierThan(MonthAndYear other)
         {
             return Year < other.Year || (Month < other.Month && Year == other.Year);
+        }
+
+        public bool IsLaterThan(MonthAndYear other)
+        {
+            return Year > other.Year || (Month > other.Month && Year == other.Year);
         }
 
         public DateTime LastDayOfMonth()

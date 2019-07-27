@@ -23,32 +23,35 @@ namespace Business.Customizations
             return Rules.IsJcpSpecific(userId) && monthAndYear.IsEarlierThan(new MonthAndYear(2014, 9));
         }
 
-        public static double CreateExtraLine(int userId, int year, int month, double @in, double tax)
+        public static double CreateExtraLine(int userId, MonthAndYear monthAndYear, double @in, double tax)
         {
-            var extra = 0.0;
-            if (userId == 1)
+            if (Rules.IsJcpSpecific(userId))
             {
-                var procent50 = 19590.0;
-                if (year > 2015 || (month > 6 && year == 2015))
+                if (monthAndYear.IsLaterThan((2017,11)))
                 {
-                    procent50 = 16800.0 + 10600;
+                    return (@in - tax) / 2 + tax;
                 }
-                if (year > 2016 || (month > 9 && year == 2016))
+                if (monthAndYear.IsLaterThan((2016, 11)))
                 {
-                    procent50 = 19200.0 + 13900;
+                    return 16000.0 + 26000;
                 }
-                if (year > 2016 || (month > 11 && year == 2016))
+                if (monthAndYear.IsLaterThan((2016,9)))
                 {
-                    procent50 = 16000.0 + 26000;
+                    return 19200.0 + 13900;
                 }
-                if (year > 2017 || (month > 11 && year == 2017))
+                if (monthAndYear.IsLaterThan((2015,6)))
                 {
-                    procent50 = (@in - tax) / 2 + tax;
+                    return 16800.0 + 10600;
                 }
-                extra = procent50;
+                return 19590.0;
             }
 
-            return extra;
+            return 0.0;
+        }
+
+        public static bool ShouldCalculateSelfPaidPension(int userId)
+        {
+            return Rules.IsJcpSpecific(userId);
         }
 
         public static double GetPensionRate(int userId, MonthAndYear monthAndYear)
@@ -67,6 +70,21 @@ namespace Business.Customizations
                 return 0.0525;
             }
             return 0.0625;
+        }
+
+        public static bool HideNegativeInWithoutPension(int userId)
+        {
+            return Rules.IsJcpSpecific(userId);
+        }
+
+        public static int GetSalerySubcategoryId(int userId)
+        {
+            if (Rules.IsJcpSpecific(userId))
+            {
+                return 2;
+            }
+
+            return 0;
         }
     }
 }

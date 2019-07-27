@@ -59,6 +59,7 @@ namespace Purchases
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
             services.AddScoped<ILegacyLossRepository, LegacyLossRepository>();
             services.AddScoped<ILegacyLossService, LegacyLossService>();
+            services.AddScoped<ILegacyPostingQueryService, LegacyPostingQueryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

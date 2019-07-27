@@ -1,4 +1,5 @@
-﻿using Legacy.Models;
+﻿using Business.Models;
+using Legacy.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,5 +13,6 @@ namespace Legacy.Repositories
         List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month);
         List<MonthlyTypeSum> Sumup(int userId);
         (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId);
+        Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId);
     }
 }

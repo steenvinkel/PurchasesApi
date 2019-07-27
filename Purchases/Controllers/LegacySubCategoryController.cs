@@ -2,6 +2,7 @@
 using System.Linq;
 using Business.Repositories;
 using DataAccess.Models;
+using Legacy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
@@ -12,11 +13,11 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacySubCategoryController : ControllerBase
     {
-        private readonly ISubCategoryRepository _subCategoryRepository;
+        private readonly ILegacyPostingQueryService _postingQueryService;
 
-        public LegacySubCategoryController(ISubCategoryRepository subCategoryRepository)
+        public LegacySubCategoryController(ILegacyPostingQueryService postingQueryService)
         {
-            _subCategoryRepository = subCategoryRepository;
+            _postingQueryService = postingQueryService;
         }
 
         [HttpGet]
@@ -24,11 +25,9 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var subcategories = _subCategoryRepository.GetList(userId);
+            var names = _postingQueryService.GetAllSubCategoryNames(userId);
 
-            var subcategoryNames = subcategories.Select(s => s.Name).ToList();
-
-            return Ok(subcategoryNames);
+            return Ok(names);
         }
     }
 }

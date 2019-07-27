@@ -153,8 +153,7 @@ namespace DataAccess.Repositories
 
             return inAndOut.Union(tax).Select(x => new MonthlyTypeSum
             {
-                Year = x.Year,
-                Month = x.Month,
+                MonthAndYear = (x.Year, x.Month),
                 Type = x.Type,
                 Sum = x.Sum,
             }).ToList();
@@ -192,6 +191,18 @@ namespace DataAccess.Repositories
                 );
 
             return (categories, summaryMap);
+        }
+
+        public Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId)
+        {
+            var monthlySum = _context.Posting
+                .Where(posting => posting.UserId == userId)
+                .Where(posting => posting.SubcategoryId == subcategoryId)
+                .GroupBy(posting => new { posting.Date.Year, posting.Date.Month })
+                .Select(pair => new {pair.Key, Sum = pair.Sum(x => x.Amount)})
+                .ToDictionary(a => new MonthAndYear(a.Key.Year, a.Key.Month), a => a.Sum);
+
+            return monthlySum;
         }
     }
 }

@@ -39,24 +39,21 @@ namespace Legacy.Tests.Services
 
             var monthlyTypeSums = new List<MonthlyTypeSum>
             {
-                new MonthlyTypeSum { Year = 2019, Month = 6, Type = "in", Sum = 25000 },
-                new MonthlyTypeSum { Year = 2019, Month = 6, Type = "out", Sum = 20000 },
-                new MonthlyTypeSum { Year = 2019, Month = 6, Type = "tax", Sum = 10000 },
-                new MonthlyTypeSum { Year = 2019, Month = 6, Type = "invest", Sum = 8.33 },
-                new MonthlyTypeSum { Year = 2019, Month = 7, Type = "in", Sum = 30000 },
-                new MonthlyTypeSum { Year = 2019, Month = 7, Type = "out", Sum = 25000 },
-                new MonthlyTypeSum { Year = 2019, Month = 7, Type = "tax", Sum = 10000 },
-                new MonthlyTypeSum { Year = 2019, Month = 7, Type = "invest", Sum = 16.67 }
+                new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "in", Sum = 25000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "out", Sum = 20000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "tax", Sum = 10000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "invest", Sum = 8.33 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "in", Sum = 30000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "out", Sum = 25000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "tax", Sum = 10000 },
+                new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "invest", Sum = 16.67 }
             };
             Mock.Get(_postingQueryRepository).Setup(x => x.Sumup(userId))
                 .Returns(monthlyTypeSums);
 
-            var yearMap = new Dictionary<int, Dictionary<int, double>> { {2019, new Dictionary<int, double> { { 6, 25000 } }} };
-            var subMap = new Dictionary<int, Dictionary<int, Dictionary<int, double>>> { { 2, yearMap } };
-            var summary = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>> { { 2, subMap } };
-
-            Mock.Get(_postingQueryRepository).Setup(x => x.Summary(userId))
-                .Returns((null, summary));
+            var monthlySalery = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 25000 } };
+            Mock.Get(_postingQueryRepository).Setup(x => x.GetSubcategoryMonthlySum(userId, 2))
+                .Returns(monthlySalery);
 
             var summedFortunes = new Dictionary<MonthAndYear, double> { { new MonthAndYear(2019, 6), 5000 }, { new MonthAndYear(2019, 5), 0 }  };
             Mock.Get(_monthlyAccountStatusRepository).Setup(x => x.CalculateSummedFortunes(userId))
