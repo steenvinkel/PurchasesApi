@@ -7,6 +7,7 @@ using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace DataAccess.Repositories
 {
@@ -17,6 +18,24 @@ namespace DataAccess.Repositories
         public LegacyPostingQueryRepository(PurchasesContext context)
         {
             _context = context;
+        }
+
+        private Dictionary<MonthAndYear, Dictionary<int, double>> GetMonthlySubcategorySum(int userId, Expression<Func<Category, bool>> categoryFilter)
+        {
+
+            var sums = (from P in _context.PostingForUser(userId)
+                        join S in _context.Subcategory on P.SubcategoryId equals S.SubcategoryId
+                        join C in _context.Category.Where(categoryFilter) on S.CategoryId equals C.CategoryId
+                        group P by new { P.Date.Year, P.Date.Month, S.SubcategoryId } into g
+                        select new
+                        {
+                            MonthAndYear = new MonthAndYear(g.Key.Year, g.Key.Month),
+                            g.Key.SubcategoryId,
+                            Sum = g.Sum(posting => posting.Amount)
+                        }).ToList();
+
+            return sums.GroupBy(x => x.MonthAndYear).ToDictionary(x => x.Key, x => x.ToDictionary(y => y.SubcategoryId, y => y.Sum));
+
         }
 
         public List<LegacyDailyNum> GetDailyPurchases(int userId)
@@ -50,26 +69,16 @@ namespace DataAccess.Repositories
         {
             var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
 
-            var sums = from posting in _context.PostingForUser(userId)
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId
-                       group posting by new { posting.Date.Year, posting.Date.Month } into g
-                       select new
-                       {
-                           g.Key.Year,
-                           g.Key.Month,
-                           Sum = g.Sum(x => x.Amount)
-                       };
+            var sums = GetMonthlySubcategorySum(userId, category => category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId)
+                .Select(x => new LegacyMonthlySumPerDay
+                {
+                    Year = x.Key.Year,
+                    Month = x.Key.Month,
+                    SumPerDay = Math.Round(x.Value.Values.Sum() / DateTime.DaysInMonth(x.Key.Year, x.Key.Month), 2)
 
-            var sumPerDay = sums.ToList().Select(sum => new LegacyMonthlySumPerDay
-            {
-                Year = sum.Year,
-                Month = sum.Month,
-                SumPerDay = Math.Round(sum.Sum / DateTime.DaysInMonth(sum.Year, sum.Month), 2)
-            });
-
-            return sumPerDay.ToList();
+                })
+                .ToList();
+            return sums;
         }
 
         public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
