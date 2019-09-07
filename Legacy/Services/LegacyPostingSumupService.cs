@@ -113,17 +113,22 @@ namespace Legacy.Services
             return savingsRateLastYear;
         }
 
-        private List<MonthAndYear> GetAllMonthsLastYear(MonthAndYear monthAndYear)
+        private List<MonthAndYear> GetPreviousMonths(MonthAndYear monthAndYear, int numberOfMonths)
         {
             var months = new List<MonthAndYear>();
             var current = monthAndYear;
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < numberOfMonths; i++)
             {
                 current = current.PreviousMonth();
                 months.Add(current);
             }
 
             return months;
+        }
+
+        private List<MonthAndYear> GetAllMonthsLastYear(MonthAndYear monthAndYear)
+        {
+            return GetPreviousMonths(monthAndYear, 12);
         }
     }
 }
