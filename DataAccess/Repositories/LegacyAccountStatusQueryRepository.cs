@@ -45,6 +45,25 @@ namespace DataAccess.Repositories
             return (categories, status);
         }
 
+        public MonthlyAccountCategorySums GetAccumulatedCategorySums(int userId)
+        {
+            var (_, monthlyAccountStatuses) = MonthlyAccountStatus(userId);
+
+            var accountCategories = new MonthlyAccountCategorySums();
+            foreach (var status in monthlyAccountStatuses)
+            {
+                var dictionary = new Dictionary<string, double>();
+                accountCategories.Add(new MonthAndYear((int)status.Year, (int)status.Month), dictionary);
+
+                foreach (var category in status.Categories.Values)
+                {
+                    dictionary.Add(category.Name, category.Amount);
+                }
+            }
+
+            return accountCategories;
+        }
+
         public Dictionary<MonthAndYear, double> CalculateSummedFortunes(int userId)
         {
             var (_, monthlyAccountStatuses) = MonthlyAccountStatus(userId);

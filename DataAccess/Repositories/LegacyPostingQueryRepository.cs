@@ -228,5 +228,23 @@ namespace DataAccess.Repositories
                     where C.Name == CategoryProperties.Name.Loss
                     select S.SubcategoryId).Single();
         }
+
+        public Dictionary<MonthAndYear, IncomeExpensesAndTax> GetMonthlyIncomeExpenseAndTax(int userId)
+        {
+            var monthlyTypeSums = Sumup(userId);
+
+            var monthlyIncomeExpensesAndTaxes = new Dictionary<MonthAndYear, IncomeExpensesAndTax>();
+            foreach(var typeSumsGroupedMonthly in monthlyTypeSums.GroupBy(x => x.MonthAndYear))
+            {
+                var incomeExpensesAndTax = new IncomeExpensesAndTax
+                {
+                    Income = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0,
+                    Expenses = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0,
+                    Tax = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0,
+                };
+                monthlyIncomeExpensesAndTaxes.Add(typeSumsGroupedMonthly.Key, incomeExpensesAndTax);
+            }
+            return monthlyIncomeExpensesAndTaxes;
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace Legacy.Repositories
         Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId);
         double GetMonthlyChange(int userId, MonthAndYear monthAndYear);
         int GetLossSubCategoryId(int userId);
+
+        Dictionary<MonthAndYear, IncomeExpensesAndTax> GetMonthlyIncomeExpenseAndTax(int userId);
     }
 }

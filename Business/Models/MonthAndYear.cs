@@ -9,6 +9,14 @@ namespace Business.Models
         public int Year { get; }
         public int Month { get; }
 
+        public static MonthAndYear Now => new MonthAndYear(DateTime.Now);
+
+        public MonthAndYear(DateTime dateTime)
+        {
+            Year = dateTime.Year;
+            Month = dateTime.Month;
+        }
+
         public MonthAndYear(int year, int month)
         {
             Year = year;
@@ -18,6 +26,19 @@ namespace Business.Models
         public static implicit operator MonthAndYear((int Year, int Month) pair)
         {
             return new MonthAndYear(pair.Year, pair.Month);
+        }
+
+        public List<MonthAndYear> PreviousMonths(int numberOfMonths)
+        {
+            var months = new List<MonthAndYear>();
+            var current = this;
+            for (int i = 0; i < numberOfMonths; i++)
+            {
+                current = current.PreviousMonth();
+                months.Add(current);
+            }
+
+            return months;
         }
 
         public MonthAndYear PreviousMonth()

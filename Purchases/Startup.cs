@@ -3,6 +3,7 @@ using Business.Repositories;
 using Business.Services;
 using DataAccess.Models;
 using DataAccess.Repositories;
+using Legacy.Dashboard;
 using Legacy.Repositories;
 using Legacy.Services;
 using Microsoft.AspNetCore.Builder;
@@ -60,6 +61,7 @@ namespace Purchases
             services.AddScoped<ILegacyLossRepository, LegacyLossRepository>();
             services.AddScoped<ILegacyLossService, LegacyLossService>();
             services.AddScoped<ILegacyPostingQueryService, LegacyPostingQueryService>();
+            services.AddScoped<IDashboardService, DashboardService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
