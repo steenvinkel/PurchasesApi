@@ -37,6 +37,8 @@ namespace Business.Tests.Services
         [TestCase(10000, 9950, 0.5)]
         [TestCase(1000, 0, 100)]
         [TestCase(0, 1000, double.NegativeInfinity)]
+        [TestCase(1000, -1000, 0)]
+        [TestCase(-1000, 1000, 0)]
         public void SavingsRate(double income, double expenses, double expectedSavingsRate)
         {
             var sut = _fixture.Create<Calculator>();
@@ -44,17 +46,6 @@ namespace Business.Tests.Services
             var savingsRate = sut.SavingsRate(income, expenses);
 
             Assert.AreEqual(expectedSavingsRate, savingsRate);
-        }
-
-        [TestCase(1000, -1000)]
-        [TestCase(-1000, 1000)]
-        public void SavingsRate_WhenOneArgumentIsBelowZero_ThrowException(double income, double expenses)
-        {
-            var sut = _fixture.Create<Calculator>();
-
-            var exception = Assert.Catch<ArgumentOutOfRangeException>(() => sut.SavingsRate(income, expenses));
-
-            StringAssert.Contains("less than", exception.Message);
         }
 
         [TestCase(20000, 15000, 300000, 0, 20, 63, 51)]

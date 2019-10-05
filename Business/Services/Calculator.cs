@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Business.Services
 {
@@ -21,13 +20,9 @@ namespace Business.Services
 
         public double SavingsRate(double income, double expenses)
         {
-            if (income < 0)
+            if (income < 0 || expenses < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(income), $"{nameof(income)} cannot be less than zero");
-            }
-            if (expenses < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(expenses), $"{nameof(expenses)} cannot be less than zero");
+                return 0;
             }
 
             return income == 0
