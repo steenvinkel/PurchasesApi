@@ -27,8 +27,11 @@ namespace Legacy.Services
             {
                 var monthAndYear = new MonthAndYear(monthlySumup.Year, monthlySumup.Month);
 
-                var invest = accountStatusSums[monthAndYear].Invest;
-                var monthsWithoutPay = CalculateMonthsWithoutPay(accountStatusSums[monthAndYear].LastMonthSummedFortune, monthlySumup.ExpensesLastYear);
+                accountStatusSums.TryGetValue(monthAndYear, out var statusSums);
+
+                var invest = statusSums?.Invest ?? 0;
+                var lastMonthSummedFortune = statusSums?.LastMonthSummedFortune ?? 0;
+                var monthsWithoutPay = CalculateMonthsWithoutPay(lastMonthSummedFortune, monthlySumup.ExpensesLastYear);
 
                 monthlySumup.Invest = Math.Round(invest, 2);
                 monthlySumup.MonthsWithoutPay = Math.Round(monthsWithoutPay, 2);
