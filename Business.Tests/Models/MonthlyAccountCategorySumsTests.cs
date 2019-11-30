@@ -89,14 +89,5 @@ namespace Business.Tests.Dashboard
         }
 
 
-        [TestCase]
-        public void GetOwnPensionSavings_IfMonthCannotBeFound_ThrowException()
-        {
-            var sut = new MonthlyAccountCategorySums(new Dictionary<MonthAndYear, Dictionary<string, double>>());
-
-            var monthAndYear = new MonthAndYear(2019, 9);
-            Assert.Catch<Exception>(() => sut.GetOwnPensionSavings(monthAndYear));
-        }
-
     }
 }
