@@ -22,10 +22,12 @@ namespace Business.Models
         public double GetOwnPensionSavings(MonthAndYear monthAndYear)
         {
             TryGetValue(monthAndYear, out var categories);
-            var currentMonthsOwnPension = categories?[Pension] ?? 0;
+            double currentMonthsOwnPension = 0;
+            categories?.TryGetValue(Pension, out currentMonthsOwnPension);
 
             TryGetValue(monthAndYear.PreviousMonth(), out var lastMonthCategories);
-            var previousMonthsOwnPension = lastMonthCategories?[Pension] ?? 0;
+            double previousMonthsOwnPension = 0;
+            lastMonthCategories?.TryGetValue(Pension, out previousMonthsOwnPension);
 
             return currentMonthsOwnPension - previousMonthsOwnPension;
         }
