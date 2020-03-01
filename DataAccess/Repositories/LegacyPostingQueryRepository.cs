@@ -20,11 +20,10 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        private Dictionary<MonthAndYear, Dictionary<int, double>> GetMonthlySubcategorySum(int userId, Expression<Func<Category, bool>> categoryFilter)
+        private Dictionary<MonthAndYear, Dictionary<int, double>> GetMonthlySubcategorySum(int userId, Expression<Func<Category, bool>> categoryFilter, Expression<Func<Subcategory, bool>> subcategoryFilter)
         {
-
             var sums = (from P in _context.PostingForUser(userId)
-                        join S in _context.Subcategory on P.SubcategoryId equals S.SubcategoryId
+                        join S in _context.Subcategory.Where(subcategoryFilter) on P.SubcategoryId equals S.SubcategoryId
                         join C in _context.Category.Where(categoryFilter) on S.CategoryId equals C.CategoryId
                         group P by new { P.Date.Year, P.Date.Month, S.SubcategoryId } into g
                         select new
@@ -35,7 +34,6 @@ namespace DataAccess.Repositories
                         }).ToList();
 
             return sums.GroupBy(x => x.MonthAndYear).ToDictionary(x => x.Key, x => x.ToDictionary(y => y.SubcategoryId, y => y.Sum));
-
         }
 
         public List<LegacyDailyNum> GetDailyPurchases(int userId)
@@ -67,15 +65,16 @@ namespace DataAccess.Repositories
 
         public List<LegacyMonthlySumPerDay> GetMonthlyAverageDailyPurchases(int userId)
         {
-            var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
+            var taxSubcategoryIds = UserSpecifics.GetTaxSubcategoryIds(userId);
 
-            var sums = GetMonthlySubcategorySum(userId, category => category.Type == CategoryProperties.Type.Out && category.CategoryId != taxCategoryId)
+            var sums = GetMonthlySubcategorySum(userId, 
+                category => category.Type == CategoryProperties.Type.Out,
+                subcategory => !taxSubcategoryIds.Contains(subcategory.SubcategoryId))
                 .Select(x => new LegacyMonthlySumPerDay
                 {
                     Year = x.Key.Year,
                     Month = x.Key.Month,
                     SumPerDay = Math.Round(x.Value.Values.Sum() / DateTime.DaysInMonth(x.Key.Year, x.Key.Month), 2)
-
                 })
                 .ToList();
             return sums;
@@ -130,7 +129,7 @@ namespace DataAccess.Repositories
 
         public List<MonthlyTypeSum> Sumup(int userId)
         {
-            var taxCategoryId = UserSpecifics.GetTaxCategoryId(userId);
+            var taxSubcategoryIds = UserSpecifics.GetTaxSubcategoryIds(userId);
 
             var inAndOut = (from p in _context.PostingForUser(userId)
                             join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
@@ -147,7 +146,8 @@ namespace DataAccess.Repositories
             var tax = (from p in _context.PostingForUser(userId)
                        join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                        join c in _context.Category on s.CategoryId equals c.CategoryId
-                       where c.Type == CategoryProperties.Type.Out && c.CategoryId == taxCategoryId
+                       where c.Type == CategoryProperties.Type.Out
+                            && taxSubcategoryIds.Contains(s.SubcategoryId)
                        group p.Amount by new { p.Date.Year, p.Date.Month } into g
                        select new
                        {

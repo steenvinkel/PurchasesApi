@@ -7,15 +7,14 @@ namespace Business.Customizations
 {
     public static class UserSpecifics
     {
-        public static int GetTaxCategoryId(int userId)
+        public static List<int> GetTaxSubcategoryIds(int userId)
         {
-            var taxCategoryId = 0;
             if (Rules.IsJcpSpecific(userId))
             {
-                taxCategoryId = 15;
+                return new List<int> { 77, 78, 88 };
             }
 
-            return taxCategoryId;
+            return new List<int>();
         }
 
         public static bool ShouldDailyPurchaseMonthBeRemoved(MonthAndYear monthAndYear, int userId)

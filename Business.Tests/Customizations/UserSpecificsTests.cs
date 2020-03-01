@@ -15,23 +15,23 @@ namespace Business.Tests.Customizations
         }
 
         [Test]
-        public void ShouldReturnZero_WhenItIsNotUser1()
+        public void ShouldReturnEmptyList_WhenItIsNotUser1()
         {
             var userId = _fixture.Create<int>() + 1;
 
-            var id = UserSpecifics.GetTaxCategoryId(userId);
+            var ids = UserSpecifics.GetTaxSubcategoryIds(userId);
 
-            Assert.AreEqual(0, id);
+            CollectionAssert.IsEmpty(ids);
         }
 
         [Test]
-        public void ShouldReturn15_WhenItIsUser1()
+        public void ShouldReturnThreeValues_WhenItIsUser1()
         {
             var userId = 1;
 
-            var id = UserSpecifics.GetTaxCategoryId(userId);
+            var ids = UserSpecifics.GetTaxSubcategoryIds(userId);
 
-            Assert.AreEqual(15, id);
+            Assert.AreEqual(3, ids.Count);
         }
     }
 }
