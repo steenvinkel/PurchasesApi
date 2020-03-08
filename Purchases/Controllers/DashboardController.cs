@@ -19,7 +19,7 @@ namespace Purchases.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDashboardInformation([FromQuery] List<int> monthsInDashboard, [FromQuery] List<double> returnRates, int currentAge, int pensionAge)
+        public ActionResult GetDashboardInformation([FromQuery] List<int> monthsInDashboard, [FromQuery] List<double> returnRates, bool allMonthAndYears, int currentAge, int pensionAge)
         {
             var userId = HttpContext.GetUserId();
 
@@ -32,7 +32,7 @@ namespace Purchases.Controllers
                 returnRates = new List<double> { 0, 0.05 };
             }
 
-            var dashboards = _dashboardService.GetDashboards(userId, monthsInDashboard, returnRates, currentAge, pensionAge);
+            var dashboards = _dashboardService.GetDashboards(userId, monthsInDashboard, allMonthAndYears, returnRates, currentAge, pensionAge);
 
             return Ok(dashboards);
         }

@@ -17,22 +17,26 @@ namespace Legacy.Dashboard
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
         }
 
-        public Dictionary<int, DashboardInformation> GetDashboards(int userId, List<int> monthsInDashboard, List<double> returnRates, int currentAge, int pensionAge)
+        public Dictionary<int, Dictionary<MonthAndYear, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
         {
             var monthlyIncomeExpensesAndTax = _postingQueryRepository.GetMonthlyIncomeExpenseAndTax(userId);
             var monthlyAccountCategorySums = _monthlyAccountStatusRepository.GetAccumulatedCategorySums(userId);
 
             var monthlyLedgers = CreateMonthlyLedgers(monthlyIncomeExpensesAndTax, monthlyAccountCategorySums);
 
-            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => 
-                    CalculateDashboard(returnRates, currentAge, pensionAge, numMonths, monthlyLedgers));
+            var monthAndYears = allMonthAndYears 
+                ? monthlyIncomeExpensesAndTax.Select(x => x.Key) 
+                : new List<MonthAndYear> { MonthAndYear.Now };
+
+            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear, monthAndYear => 
+                    CalculateDashboard(monthAndYear, returnRates, currentAge, pensionAge, numMonths, monthlyLedgers)));
 
             return dashboards;
         }
 
-        private DashboardInformation CalculateDashboard(List<double> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
+        private DashboardInformation CalculateDashboard(MonthAndYear currentMonthAndYear, List<double> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
         {
-            var ledger = CalculateAverageLedger(monthlyLedgers, numMonths);
+            var ledger = CalculateAverageLedger(monthlyLedgers, numMonths, currentMonthAndYear);
             return CalculateDashboard(ledger, currentAge, pensionAge, returnRates);
         }
 
@@ -58,9 +62,9 @@ namespace Legacy.Dashboard
             return dashboardInformation;
         }
 
-        private Ledger CalculateAverageLedger(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths)
+        private Ledger CalculateAverageLedger(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths, MonthAndYear currentMonthAndYear)
         {
-            return CalculateAverageLedgers(monthlyLedgers, numMonths)[MonthAndYear.Now];
+            return CalculateAverageLedgers(monthlyLedgers, numMonths)[currentMonthAndYear];
         }
 
         private Dictionary<MonthAndYear, Ledger> CalculateAverageLedgers(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths)

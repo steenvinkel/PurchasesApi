@@ -91,5 +91,10 @@ namespace Business.Models
 
             return IsEarlierThan(other) ? -1 : 1;
         }
+
+        public override string ToString()
+        {
+            return Year + "-" + Month.ToString("00");
+        }
     }
 }
