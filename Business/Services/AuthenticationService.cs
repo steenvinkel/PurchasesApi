@@ -32,7 +32,7 @@ namespace Business.Services
 
         }
 
-        public bool IsValidCredentials(string username, string password)
+        public string IsValidCredentials(string username, string password)
         {
             var user = _userRepository.GetByUsername(username);
 
@@ -47,8 +47,13 @@ namespace Business.Services
 
                 var hashedPassword = hashedInputStringBuilder.ToString();
 
-                return hashedPassword == user.Item3.ToUpper();
+                if (hashedPassword != user.Item3.ToUpper())
+                {
+                    throw new UnauthorizedAccessException();
+                }
             }
+
+            return user.Item1;
         }
     }
 }

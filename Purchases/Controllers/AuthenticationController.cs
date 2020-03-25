@@ -37,13 +37,16 @@ namespace Purchases.Controllers
         [HttpPost]
         public ActionResult Login([FromBody] Credentials credentials)
         {
-            var username = credentials.Username;
-            var password = credentials.Password;
-            bool authenticated = _authenticationService.IsValidCredentials(username, password);
+            try
+            {
+                var authToken = _authenticationService.IsValidCredentials(credentials.Username, credentials.Password);
 
-            return authenticated
-                ? Ok() as ActionResult
-                : Unauthorized();
+                return Ok(authToken);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpGet("ValidateToken")]
