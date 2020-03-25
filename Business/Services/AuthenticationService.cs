@@ -1,6 +1,8 @@
 ﻿using Business.Repositories;
 using System;
 using System.Security.Authentication;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Business.Services
 {
@@ -28,6 +30,25 @@ namespace Business.Services
 
             return (user.UserId, user.AuthExpire);
 
+        }
+
+        public bool IsValidCredentials(string username, string password)
+        {
+            var user = _userRepository.GetByUsername(username);
+
+            using (SHA512 shaM = new SHA512Managed())
+            {
+                var data = Encoding.UTF8.GetBytes(password);
+                var hash = shaM.ComputeHash(data);
+
+                var hashedInputStringBuilder = new StringBuilder(128);
+                foreach (var b in hash)
+                    hashedInputStringBuilder.Append(b.ToString("X2"));
+
+                var hashedPassword = hashedInputStringBuilder.ToString();
+
+                return hashedPassword == user.Item3.ToUpper();
+            }
         }
     }
 }

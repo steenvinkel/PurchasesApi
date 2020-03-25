@@ -28,6 +28,18 @@ namespace Purchases.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public ActionResult Login()
+        {
+            var username = HttpContext.Request.Form["username"];
+            var password = HttpContext.Request.Form["password"];
+            bool authenticated = _authenticationService.IsValidCredentials(username, password);
+
+            return authenticated
+                ? Ok() as ActionResult
+                : Unauthorized();
+        }
+
         [HttpGet("ValidateToken")]
         public ActionResult ValidateToken(string authToken)
         {
