@@ -28,11 +28,17 @@ namespace Purchases.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        public ActionResult Login()
+        public class Credentials
         {
-            var username = HttpContext.Request.Form["username"];
-            var password = HttpContext.Request.Form["password"];
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
+
+        [HttpPost]
+        public ActionResult Login([FromBody] Credentials credentials)
+        {
+            var username = credentials.Username;
+            var password = credentials.Password;
             bool authenticated = _authenticationService.IsValidCredentials(username, password);
 
             return authenticated
