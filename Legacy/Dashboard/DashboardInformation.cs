@@ -10,5 +10,7 @@ namespace Legacy.Dashboard
         public double Fortune { get; set; }
         public double IncomeWithoutTaxAndPension { get; set; }
         public double ExpensesWithoutTax { get; set; }
+        public double NetworthIncreaseFortune { get; set; }
+        public double NetworthIncreaseInvestment { get; set; }
     }
 }

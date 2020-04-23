@@ -9,5 +9,7 @@
         public double OwnPension { get; set; } = 0;
         public double Tax { get; set; } = 0;
         public double Fortune { get; set; } = 0;
+        public double FortuneIncrease { get; set; } = 0;
+        public double InvestmentIncrease { get; set; } = 0;
     }
 }

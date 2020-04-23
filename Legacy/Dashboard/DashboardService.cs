@@ -57,6 +57,8 @@ namespace Legacy.Dashboard
                 FireAgePerReturnRate = fireAges,
                 IncomeWithoutTaxAndPension = ledger.IncomeWithoutTaxAndPension,
                 ExpensesWithoutTax = ledger.ExpensesWithoutTax,
+                NetworthIncreaseFortune = ledger.FortuneIncrease,
+                NetworthIncreaseInvestment = ledger.InvestmentIncrease
             };
 
             return dashboardInformation;
@@ -93,6 +95,8 @@ namespace Legacy.Dashboard
                     Tax = previousMonths.Average(x => x.Tax),
                     OwnPension = previousMonths.Average(x => x.OwnPension),
                     Fortune = previousMonthlyLedger?.Fortune ?? 0,
+                    FortuneIncrease = previousMonths.Average(x => x.FortuneIncrease),
+                    InvestmentIncrease = previousMonths.Average(x => x.InvestmentIncrease)
                 };
             });
         }
@@ -118,7 +122,9 @@ namespace Legacy.Dashboard
                     ExpensesWithoutTax = expenses - tax,
                     Tax = tax,
                     OwnPension = ownPension,
-                    Fortune = summedFortunes
+                    Fortune = summedFortunes,
+                    FortuneIncrease = monthlyAccountCategorySums.GetFortune(monthAndYear),
+                    InvestmentIncrease = monthlyAccountCategorySums.GetInvestment(monthAndYear),
                 };
 
                 monthlyLedgers.Add(monthAndYear, values);
