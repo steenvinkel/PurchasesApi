@@ -58,7 +58,9 @@ namespace Legacy.Dashboard
                 IncomeWithoutTaxAndPension = ledger.IncomeWithoutTaxAndPension,
                 ExpensesWithoutTax = ledger.ExpensesWithoutTax,
                 NetworthIncreaseFortune = ledger.FortuneIncrease,
-                NetworthIncreaseInvestment = ledger.InvestmentIncrease
+                NetworthIncreaseInvestment = ledger.InvestmentIncrease,
+                VariableExpenses = ledger.VariableExpenses,
+                FixedExpenses = ledger.FixedExpenses
             };
 
             return dashboardInformation;
@@ -92,6 +94,8 @@ namespace Legacy.Dashboard
                     IncomeWithoutTaxAndPension = previousMonths.Average(x => x.IncomeWithoutTaxAndPension),
                     Expenses = previousMonths.Average(x => x.Expenses),
                     ExpensesWithoutTax = previousMonths.Average(x => x.ExpensesWithoutTax),
+                    VariableExpenses = previousMonths.Average(x => x.VariableExpenses),
+                    FixedExpenses = previousMonths.Average(x => x.FixedExpenses),
                     Tax = previousMonths.Average(x => x.Tax),
                     OwnPension = previousMonths.Average(x => x.OwnPension),
                     Fortune = previousMonthlyLedger?.Fortune ?? 0,
@@ -112,6 +116,8 @@ namespace Legacy.Dashboard
                 var income = pair.Value.Income;
                 var expenses = pair.Value.Expenses;
                 var tax = pair.Value.Tax;
+                var variableExpenses = pair.Value.VariableExpenses;
+                var fixedExpenses = pair.Value.FixedExpenses;
                 var ownPension = monthlyAccountCategorySums.GetOwnPensionSavings(monthAndYear);
                 var summedFortunes = monthlyAccountCategorySums.GetFortunesWithoutPension(monthAndYear);
                 var values = new Ledger
@@ -120,6 +126,8 @@ namespace Legacy.Dashboard
                     IncomeWithoutTaxAndPension = income - tax - ownPension,
                     Expenses = expenses,
                     ExpensesWithoutTax = expenses - tax,
+                    VariableExpenses = variableExpenses,
+                    FixedExpenses = fixedExpenses,
                     Tax = tax,
                     OwnPension = ownPension,
                     Fortune = summedFortunes,

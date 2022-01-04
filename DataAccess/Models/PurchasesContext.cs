@@ -217,6 +217,10 @@ namespace DataAccess.Models
                     .HasColumnName("color")
                     .HasColumnType("varchar(6)");
 
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasColumnType("varchar(10)");
+
                 entity.Property(e => e.CreatedOn)
                     .HasColumnName("created_on")
                     .HasColumnType("datetime");

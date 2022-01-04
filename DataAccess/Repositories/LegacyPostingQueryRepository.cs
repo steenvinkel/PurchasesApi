@@ -229,9 +229,26 @@ namespace DataAccess.Repositories
                     select S.SubcategoryId).Single();
         }
 
+        public Dictionary<MonthAndYear, (double variable, double @fixed)> GetMonthlyVariableAndFixedExpenses(int userId)
+        {
+            var expenses = (from p in _context.PostingForUser(userId)
+                            join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId where s.Type != null
+                            group p.Amount by new { p.Date.Year, p.Date.Month, s.Type } into g
+                            select new
+                            {
+                                MonthAndYear = new MonthAndYear(g.Key.Year, g.Key.Month),
+                                g.Key.Type,
+                                Sum = g.Sum()
+                            }).ToList();
+
+            return expenses.GroupBy(e => e.MonthAndYear)
+                .ToDictionary(g => g.Key, g => (g.First(e => e.Type == "variable").Sum, g.First(e => e.Type == "fixed").Sum));
+        }
+
         public Dictionary<MonthAndYear, IncomeExpensesAndTax> GetMonthlyIncomeExpenseAndTax(int userId)
         {
             var monthlyTypeSums = Sumup(userId);
+            var monthlyVariableAndFixedExpenses = GetMonthlyVariableAndFixedExpenses(userId);
 
             var monthlyIncomeExpensesAndTaxes = new Dictionary<MonthAndYear, IncomeExpensesAndTax>();
             foreach(var typeSumsGroupedMonthly in monthlyTypeSums.GroupBy(x => x.MonthAndYear))
@@ -241,6 +258,8 @@ namespace DataAccess.Repositories
                     Income = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0,
                     Expenses = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0,
                     Tax = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0,
+                    VariableExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].variable,
+                    FixedExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].@fixed
                 };
                 monthlyIncomeExpensesAndTaxes.Add(typeSumsGroupedMonthly.Key, incomeExpensesAndTax);
             }

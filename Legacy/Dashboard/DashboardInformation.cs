@@ -12,5 +12,7 @@ namespace Legacy.Dashboard
         public double ExpensesWithoutTax { get; set; }
         public double NetworthIncreaseFortune { get; set; }
         public double NetworthIncreaseInvestment { get; set; }
+        public double VariableExpenses { get; set; }
+        public double FixedExpenses { get; set; }
     }
 }
