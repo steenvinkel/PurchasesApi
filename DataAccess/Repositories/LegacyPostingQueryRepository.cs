@@ -242,7 +242,7 @@ namespace DataAccess.Repositories
                             }).ToList();
 
             return expenses.GroupBy(e => e.MonthAndYear)
-                .ToDictionary(g => g.Key, g => (g.First(e => e.Type == "variable").Sum, g.First(e => e.Type == "fixed").Sum));
+                .ToDictionary(g => g.Key, g => (g.FirstOrDefault(e => e.Type == "variable")?.Sum ?? 0, g.FirstOrDefault(e => e.Type == "fixed")?.Sum ?? 0));
         }
 
         public Dictionary<MonthAndYear, IncomeExpensesAndTax> GetMonthlyIncomeExpenseAndTax(int userId)
