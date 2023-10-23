@@ -35,7 +35,7 @@ namespace Purchases.Controllers
             var userId = HttpContext.GetUserId();
             var newPosting = _postingRepository.Put(posting, userId);
 
-            return Ok(newPosting).AddLegacyFormatting();
+            return Ok(newPosting);
         }
 
         [HttpPost]

@@ -7,6 +7,7 @@ using Purchases.IntegrationTests;
 using NUnit.Framework;
 using System.Net;
 using System.Dynamic;
+using System.Text.Json;
 
 namespace Purchases.IntegrationTests
 {
@@ -36,7 +37,7 @@ namespace Purchases.IntegrationTests
         public async Task Sumup_ShouldEmptyList()
         {
             var result = await _client.GetAsync("/api/LegacyGraph/Sumup");
-            var content = await result.Content.ReadAsAsync<List<ExpandoObject>>();
+            var content = await JsonSerializer.DeserializeAsync<List<ExpandoObject>>(await result.Content.ReadAsStreamAsync());
             Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             CollectionAssert.IsNotEmpty(content);
             var element = (IDictionary<String, object>)content.First();

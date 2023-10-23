@@ -2,14 +2,14 @@
 using NUnit.Framework;
 using Purchases;
 using Purchases.IntegrationTests;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Net;
 using AutoFixture;
+using System.Text;
+using System.Text.Json;
 
 namespace IntegrationTests.Controllers
 {
@@ -28,6 +28,11 @@ namespace IntegrationTests.Controllers
             _client.DefaultRequestHeaders.Add("auth_token", _factory.AuthToken);
             _fixture = new Fixture();
         }
+
+        public static StringContent SerializeToStringContent(object obj)
+        {
+            return new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");
+        }
         
         [Test]
         public async Task SavePostingWithoutSubCategory_ListNewPostingOnGet()
@@ -37,7 +42,7 @@ namespace IntegrationTests.Controllers
             postingToSave.Posting_id = 0;
 
             // Act
-            var postResponse = await _client.PostAsync("/api/LegacyPosting", postingToSave, new JsonMediaTypeFormatter());
+            var postResponse = await _client.PostAsync("/api/LegacyPosting", SerializeToStringContent(postingToSave));
             var savedPosting = await postResponse.Content.ReadAsAsync<LegacyPosting>();
 
             // Assert
@@ -72,7 +77,7 @@ namespace IntegrationTests.Controllers
             postingToSave.Description = _factory.SubCategoryName;
 
             // Act
-            var postResponse = await _client.PostAsync("/api/LegacyPosting", postingToSave, new JsonMediaTypeFormatter());
+            var postResponse = await _client.PostAsync("/api/LegacyPosting", SerializeToStringContent(postingToSave));
             var savedPosting = await postResponse.Content.ReadAsAsync<LegacyPosting>();
 
             // Assert
@@ -95,7 +100,7 @@ namespace IntegrationTests.Controllers
             postingToUpdate.Description = _factory.SubCategoryName;
 
             // Act
-            var putResponse = await _client.PutAsync("/api/LegacyPosting", postingToUpdate, new JsonMediaTypeFormatter());
+            var putResponse = await _client.PutAsync("/api/LegacyPosting", SerializeToStringContent(postingToUpdate));
             var updatedPosting = await putResponse.Content.ReadAsAsync<LegacyPosting>();
 
             // Assert

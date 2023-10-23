@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using System.Buffers;
 
 namespace Legacy.LegacyFormatting
@@ -36,7 +36,7 @@ namespace Legacy.LegacyFormatting
         private static IOutputFormatter CreateLegacyFormatter()
         {
             var serializerSettings = JsonSerializerSettingsProvider.CreateSerializerSettings();
-            return new LegacyOutputFormatter(serializerSettings, ArrayPool<char>.Shared);
+            return new LegacyOutputFormatter(serializerSettings, ArrayPool<char>.Shared, new MvcOptions());
         }
     }
 }

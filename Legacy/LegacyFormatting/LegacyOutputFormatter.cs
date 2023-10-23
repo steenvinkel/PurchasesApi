@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 using System.Buffers;
+using Newtonsoft.Json;
 
 namespace Legacy.LegacyFormatting
 {
-    public class LegacyOutputFormatter : JsonOutputFormatter
+    public class LegacyOutputFormatter : NewtonsoftJsonOutputFormatter
     {
-        public LegacyOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool) : base(serializerSettings, charPool)
+        public LegacyOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions) : base(serializerSettings, charPool, mvcOptions)
         {
             serializerSettings.Converters.Add(new LegacyJsonConverter());
         }

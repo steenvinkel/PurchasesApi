@@ -8,10 +8,10 @@ using Legacy.Repositories;
 using Legacy.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Purchases.Helpers;
 using Purchases.Middleware;
 
@@ -38,10 +38,11 @@ namespace Purchases
                     .AllowAnyHeader()
                 );
             });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddMvc(config => {
                 config.Filters.Add(new LegacyActionFilter());
-            });
+                })
+                .AddNewtonsoftJson();
 
             var connection = Environment.GetEnvironmentVariable("sql_connection");
             services.AddDbContext<PurchasesContext>(options => options.UseMySql(connection));
@@ -65,7 +66,7 @@ namespace Purchases
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -77,11 +78,19 @@ namespace Purchases
                 app.UseHsts();
             }
 
-            app.UseCors("CORSPolicy");
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+            app.UseCors("CORSPolicy");
+
+            app.UseAuthorization();
             app.UseMiddleware<CustomAuthenticationMiddleware>();
-            app.UseMvc();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
