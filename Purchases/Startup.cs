@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Purchases.Helpers;
+using System.Text.Json.Serialization;
 using Purchases.Middleware;
 
 namespace Purchases
@@ -31,10 +31,10 @@ namespace Purchases
         {
             services.AddMemoryCache();
 
-            services.AddMvc(config => {
-                config.Filters.Add(new LegacyActionFilter());
-                })
-                .AddNewtonsoftJson();
+            services.AddMvc()
+                .AddJsonOptions(configure => 
+                        configure.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals | JsonNumberHandling.AllowReadingFromString
+                    );
 
             var connection = Environment.GetEnvironmentVariable("sql_connection");
             services.AddDbContext<PurchasesContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0))));
@@ -69,7 +69,6 @@ namespace Purchases
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
 
             app.UseHttpsRedirection();
 

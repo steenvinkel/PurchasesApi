@@ -1,5 +1,4 @@
-﻿using Legacy.LegacyFormatting;
-using Legacy.Models;
+﻿using Legacy.Models;
 using Legacy.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

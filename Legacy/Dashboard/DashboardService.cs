@@ -17,7 +17,7 @@ namespace Legacy.Dashboard
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
         }
 
-        public Dictionary<int, Dictionary<MonthAndYear, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
+        public Dictionary<int, Dictionary<string, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
         {
             var monthlyIncomeExpensesAndTax = _postingQueryRepository.GetMonthlyIncomeExpenseAndTax(userId);
             var monthlyAccountCategorySums = _monthlyAccountStatusRepository.GetAccumulatedCategorySums(userId);
@@ -28,7 +28,7 @@ namespace Legacy.Dashboard
                 ? monthlyIncomeExpensesAndTax.Select(x => x.Key) 
                 : new List<MonthAndYear> { MonthAndYear.Now };
 
-            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear, monthAndYear => 
+            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear.ToString(), monthAndYear => 
                     CalculateDashboard(monthAndYear, returnRates, currentAge, pensionAge, numMonths, monthlyLedgers)));
 
             return dashboards;

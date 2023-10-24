@@ -1,6 +1,5 @@
 ﻿using Business.Models;
 using Business.Repositories;
-using Legacy.LegacyFormatting;
 using Legacy.Mappers;
 using Legacy.Models;
 using Legacy.Repositories;
@@ -35,7 +34,7 @@ namespace Purchases.Controllers
 
             var mapper = new AccountStatusMapper();
 
-            return mapper.Map(accountStatuses).AddLegacyFormatting();
+            return mapper.Map(accountStatuses);
         }
 
         [HttpPost]
