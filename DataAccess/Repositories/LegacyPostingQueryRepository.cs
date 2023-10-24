@@ -83,36 +83,44 @@ namespace DataAccess.Repositories
         public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
         {
             var inTypes =
-                       from posting in _context.PostingForUser(userId)
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == CategoryProperties.Type.In
-                            && posting.Date.Year == year && posting.Date.Month == month
-                       group new { posting, category, subcategory } by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId } into g
-                       select new {
-                           g.Key.Year,
-                           g.Key.Month,
-                           g.First().category.Type,
-                           g.First().subcategory.Name,
-                           g.First().subcategory.Color,
-                           Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                       };
+                       (from posting in _context.PostingForUser(userId)
+                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
+                        where category.Type == CategoryProperties.Type.In
+                             && posting.Date.Year == year && posting.Date.Month == month
+                        select new { posting, category, subcategory }
+                             )
+                            .ToList()
+                            .GroupBy((x) => new { x.posting.Date.Year, x.posting.Date.Month, x.subcategory.SubcategoryId })
+                            .Select(g => new
+                                {
+                                    g.Key.Year,
+                                    g.Key.Month,
+                                    g.First().category.Type,
+                                    g.First().subcategory.Name,
+                                    g.First().subcategory.Color,
+                                    Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
+                                });
 
             var outTypes =
-                       from posting in _context.PostingForUser(userId)
+                       (from posting in _context.PostingForUser(userId)
                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
                        where category.Type == CategoryProperties.Type.Out
                             && posting.Date.Year == year && posting.Date.Month == month
-                       group new { posting, category } by new { posting.Date.Year, posting.Date.Month, category.CategoryId } into g
-                       select new {
-                           g.Key.Year,
-                           g.Key.Month,
-                           g.First().category.Type,
-                           g.First().category.Name,
-                           g.First().category.Color,
-                           Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                       };
+                        select new { posting, category }
+                             )
+                            .ToList()
+                            .GroupBy((x) => new { x.posting.Date.Year, x.posting.Date.Month, x.category.CategoryId })
+                            .Select(g => new
+                                {
+                                    g.Key.Year,
+                                    g.Key.Month,
+                                    g.First().category.Type,
+                                    g.First().category.Name,
+                                    g.First().category.Color,
+                                    Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
+                                });
 
             var result = inTypes.Union(outTypes).Select(x => new LegacyMonthlyTypeSumWithColorAndName
             {
