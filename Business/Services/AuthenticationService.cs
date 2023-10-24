@@ -36,7 +36,7 @@ namespace Business.Services
         {
             var user = _userRepository.GetByUsername(username);
 
-            using (SHA512 shaM = new SHA512Managed())
+            using (SHA512 shaM = SHA512.Create())
             {
                 var data = Encoding.UTF8.GetBytes(password);
                 var hash = shaM.ComputeHash(data);

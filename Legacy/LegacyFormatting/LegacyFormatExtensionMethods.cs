@@ -36,7 +36,7 @@ namespace Legacy.LegacyFormatting
         private static IOutputFormatter CreateLegacyFormatter()
         {
             var serializerSettings = JsonSerializerSettingsProvider.CreateSerializerSettings();
-            return new LegacyOutputFormatter(serializerSettings, ArrayPool<char>.Shared, new MvcOptions());
+            return new LegacyOutputFormatter(serializerSettings, ArrayPool<char>.Shared, new MvcOptions(), new MvcNewtonsoftJsonOptions());
         }
     }
 }

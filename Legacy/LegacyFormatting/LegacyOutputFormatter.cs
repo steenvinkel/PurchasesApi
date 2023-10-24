@@ -7,7 +7,7 @@ namespace Legacy.LegacyFormatting
 {
     public class LegacyOutputFormatter : NewtonsoftJsonOutputFormatter
     {
-        public LegacyOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions) : base(serializerSettings, charPool, mvcOptions)
+        public LegacyOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcNewtonsoftJsonOptions) : base(serializerSettings, charPool, mvcOptions, mvcNewtonsoftJsonOptions)
         {
             serializerSettings.Converters.Add(new LegacyJsonConverter());
         }

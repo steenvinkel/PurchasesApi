@@ -108,7 +108,7 @@ namespace DataAccess.Models
                 entity.ToTable("category");
 
                 entity.HasIndex(e => e.UserId)
-                    .HasName("user_id");
+                    .HasDatabaseName("user_id");
 
                 entity.Property(e => e.CategoryId)
                     .HasColumnName("category_id")
@@ -150,10 +150,10 @@ namespace DataAccess.Models
                 entity.ToTable("posting");
 
                 entity.HasIndex(e => e.SubcategoryId)
-                    .HasName("subcategory_id");
+                    .HasDatabaseName("subcategory_id");
 
                 entity.HasIndex(e => e.UserId)
-                    .HasName("user_id");
+                    .HasDatabaseName("user_id");
 
                 entity.Property(e => e.PostingId)
                     .HasColumnName("posting_id")
@@ -199,10 +199,10 @@ namespace DataAccess.Models
                 entity.ToTable("subcategory");
 
                 entity.HasIndex(e => e.CategoryId)
-                    .HasName("category_id");
+                    .HasDatabaseName("category_id");
 
                 entity.HasIndex(e => new { e.Name, e.CategoryId })
-                    .HasName("name")
+                    .HasDatabaseName("name")
                     .IsUnique();
 
                 entity.Property(e => e.SubcategoryId)

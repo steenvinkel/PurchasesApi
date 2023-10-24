@@ -45,7 +45,7 @@ namespace Purchases
                 .AddNewtonsoftJson();
 
             var connection = Environment.GetEnvironmentVariable("sql_connection");
-            services.AddDbContext<PurchasesContext>(options => options.UseMySql(connection));
+            services.AddDbContext<PurchasesContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0))));
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountStatusRepository, AccountStatusRepository>();
