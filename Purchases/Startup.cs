@@ -30,14 +30,6 @@ namespace Purchases
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CORSPolicy", builder => builder
-                    .WithOrigins("http://euve10292.server4you.net", "https://euve10292.server4you.net")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                );
-            });
 
             services.AddMvc(config => {
                 config.Filters.Add(new LegacyActionFilter());
@@ -82,7 +74,6 @@ namespace Purchases
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors("CORSPolicy");
 
             app.UseAuthorization();
             app.UseMiddleware<CustomAuthenticationMiddleware>();
