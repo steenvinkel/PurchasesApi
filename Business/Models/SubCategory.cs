@@ -6,7 +6,7 @@ namespace Business.Models
 {
     public class SubCategory
     {
-        public SubCategory(int id, int categoryId, string name, string color)
+        public SubCategory(int id, int categoryId, string name, string? color)
         {
             Id = id;
             CategoryId = categoryId;
@@ -17,6 +17,6 @@ namespace Business.Models
         public int Id { get; }
         public int CategoryId { get; }
         public string Name { get; }
-        public string Color { get; }
+        public string? Color { get; }
     }
 }

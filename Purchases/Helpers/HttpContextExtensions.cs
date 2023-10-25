@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 
 namespace Purchases.Helpers
 {
@@ -6,7 +7,11 @@ namespace Purchases.Helpers
     {
         public static int GetUserId(this HttpContext context)
         {
-            return (int)context.Items[HttpContextItemNames.UserId];
+            var userId = (int?)context.Items[HttpContextItemNames.UserId];
+
+            return userId == null
+                ? throw new Exception("Could not find userId")
+                : userId.Value;
         }
 
         public static void SetUserId(this HttpContext context, int userId)
@@ -14,7 +19,7 @@ namespace Purchases.Helpers
             context.Items.Add(HttpContextItemNames.UserId, userId);
         }
 
-        public static string GetAuthToken(this HttpContext context)
+        public static string? GetAuthToken(this HttpContext context)
         {
             var authToken = context.Request.Cookies["auth_token"];
             if (authToken == null)

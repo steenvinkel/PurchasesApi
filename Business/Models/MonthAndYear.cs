@@ -70,7 +70,7 @@ namespace Business.Models
             return new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is MonthAndYear year &&
                    Year == year.Year &&
@@ -82,8 +82,10 @@ namespace Business.Models
             return HashCode.Combine(Year, Month);
         }
 
-        public int CompareTo(MonthAndYear other)
+        public int CompareTo(MonthAndYear? other)
         {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+
             if (Equals(other))
             {
                 return 0;

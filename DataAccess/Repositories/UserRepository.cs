@@ -1,5 +1,4 @@
-﻿using Business.Models;
-using Business.Repositories;
+﻿using Business.Repositories;
 using DataAccess.Models;
 using System;
 using System.Linq;
@@ -15,23 +14,27 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public Business.Models.User Get(string authToken)
+        public Business.Models.User? Get(string authToken)
         {
             var user = _context.User.SingleOrDefault(u => u.AuthToken == authToken);
 
-            return Map(user);
+            return user != null
+                ? Map(user)
+                : null;
         }
 
-        public (string, DateTime, string, int) GetByUsername(string username)
+        public (string, string)? GetAuthTokenAndPasswordByUsername(string username)
         {
             var user = _context.User.SingleOrDefault(u => u.Username == username);
 
-            return (user.AuthToken, user.AuthExpire, user.Password, user.UserId);
+            return user != null
+                ? (user.AuthToken, user.Password)
+                : null;
         }
 
         private static Business.Models.User Map(Models.User user)
         {
-            return user != null ? new Business.Models.User(user.UserId, user.Username, user.AuthToken, user.AuthExpire) : null;
+            return new Business.Models.User(user.UserId, user.Username, user.AuthToken, user.AuthExpire);
         }
 
         public void SaveAuthToken(int userId, string authToken, DateTime authExpire)

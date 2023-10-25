@@ -34,7 +34,7 @@ namespace DataAccess.Repositories
                 Latitude = p.posting.Latitude,
                 Longitude = p.posting.Longitude,
                 Accuracy = p.posting.Accuracy,
-                Description = p.Description ?? p.posting.Description
+                Description = p.Description ?? p.posting.Description ?? string.Empty
             }).ToList();
         }
 
@@ -47,8 +47,9 @@ namespace DataAccess.Repositories
             }
 
             var subcategoryId = GetSubcategoryIdFromName(userId, posting.Description);
+
             existingPosting.Amount = posting.Amount;
-            existingPosting.Description = subcategoryId == null ? posting.Description : null;
+            existingPosting.Description = subcategoryId == null ? posting.Description : "";
             existingPosting.SubcategoryId = subcategoryId;
             existingPosting.Date = posting.Date;
             existingPosting.Longitude = posting.Longitude;
@@ -68,7 +69,7 @@ namespace DataAccess.Repositories
             var newPosting = new Posting
             {
                 Amount = posting.Amount,
-                Description = subcategoryId == null ? posting.Description : null,
+                Description = subcategoryId == null ? posting.Description : "",
                 Date = posting.Date.Date,
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
@@ -94,7 +95,7 @@ namespace DataAccess.Repositories
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
                 Accuracy = posting.Accuracy,
-                Description = posting.SubcategoryId != null ? description : posting.Description
+                Description = posting.SubcategoryId != null ? description : posting.Description ?? string.Empty
             };
         }
 

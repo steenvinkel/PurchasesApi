@@ -29,7 +29,7 @@ namespace Purchases.Middleware
                 return;
             }
 
-            string authToken = context.GetAuthToken();
+            var authToken = context.GetAuthToken() ?? throw new AuthenticationException($"The authentication token is invalid");
 
             if (!_cache.TryGetValue(authToken, out int userId))
             {

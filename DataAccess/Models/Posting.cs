@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DataAccess.Models
 {
@@ -8,7 +7,7 @@ namespace DataAccess.Models
         public int PostingId { get; set; }
         public int UserId { get; set; }
         public int? SubcategoryId { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public double Amount { get; set; }
         public DateTime Date { get; set; }
         public double? Latitude { get; set; }

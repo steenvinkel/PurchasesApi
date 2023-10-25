@@ -21,7 +21,7 @@ namespace DataAccess.Repositories
         {
             int lossSubcategoryId = _postingQueryRepository.GetLossSubCategoryId(userId);
 
-            Posting lossPosting = GetExistingLossPosting(userId, monthAndYear, lossSubcategoryId);
+            Posting? lossPosting = GetExistingLossPosting(userId, monthAndYear, lossSubcategoryId);
 
             if (lossPosting == null)
             {
@@ -41,7 +41,7 @@ namespace DataAccess.Repositories
             {
                 UserId = userId,
                 SubcategoryId = lossSubcategoryId,
-                Description = null,
+                Description = "",
                 Date = monthAndYear.LastDayOfMonth(),
                 Latitude = null,
                 Longitude = null,
@@ -49,7 +49,7 @@ namespace DataAccess.Repositories
             };
         }
 
-        private Posting GetExistingLossPosting(int userId, MonthAndYear monthAndYear, int lossSubcategoryId)
+        private Posting? GetExistingLossPosting(int userId, MonthAndYear monthAndYear, int lossSubcategoryId)
         {
             return _context.PostingForUser(userId)
                 .Where(posting => posting.Date.Year == monthAndYear.Year)

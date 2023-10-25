@@ -34,7 +34,7 @@ namespace Business.Services
 
         public string IsValidCredentials(string username, string password)
         {
-            var user = _userRepository.GetByUsername(username);
+            var (AuthToken, Password) = _userRepository.GetAuthTokenAndPasswordByUsername(username) ?? throw new UnauthorizedAccessException();
 
             using (SHA512 shaM = SHA512.Create())
             {
@@ -47,13 +47,13 @@ namespace Business.Services
 
                 var hashedPassword = hashedInputStringBuilder.ToString();
 
-                if (hashedPassword != user.Item3.ToUpper())
+                if (hashedPassword != Password.ToUpper())
                 {
                     throw new UnauthorizedAccessException();
                 }
             }
 
-            return user.Item1;
+            return AuthToken;
         }
     }
 }

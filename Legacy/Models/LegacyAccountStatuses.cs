@@ -19,7 +19,7 @@ namespace Legacy.Models
             Month = month;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is LegacyAccountStatus other &&
                    Account_id == other.Account_id &&
