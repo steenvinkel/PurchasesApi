@@ -12,6 +12,5 @@
         public double SavingsLastYear { get; set; }
         public double ExpensesLastYear { get; set; }
         public double MonthsWithoutPay { get; set; }
-        public double Extra { get; set; }
     }
 }

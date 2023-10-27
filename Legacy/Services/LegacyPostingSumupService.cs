@@ -34,8 +34,6 @@ namespace Legacy.Services
                 var @out = data.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0;
                 var tax = data.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0;
 
-                double extra = UserSpecifics.CreateExtraLine(userId, monthAndYear, @in, tax);
-
                 var pureIn = @in - tax;
                 var pureOut = @out - tax;
 
@@ -56,7 +54,6 @@ namespace Legacy.Services
                     Savings = Math.Round(savingProcentage, 2),
                     SavingsLastYear = Math.Round(savingsLastYear, 2),
                     ExpensesLastYear = Math.Round(expensesLastYear, 2),
-                    Extra = Math.Round(extra, 2),
                 });
             }
 

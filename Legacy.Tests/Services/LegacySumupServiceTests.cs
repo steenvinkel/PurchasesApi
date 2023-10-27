@@ -78,7 +78,6 @@ namespace Legacy.Tests.Services
             Assert.AreEqual(33.33, monthlySumup.Savings);
             Assert.AreEqual(0, monthlySumup.SavingsLastYear);
             Assert.AreEqual(0, monthlySumup.ExpensesLastYear);
-            Assert.AreEqual(17500, monthlySumup.Extra);
             Assert.AreEqual(0, monthlySumup.MonthsWithoutPay);
 
             monthlySumup = result.SingleOrDefault(x => x.Year == 2019 && x.Month == 7);
@@ -90,7 +89,6 @@ namespace Legacy.Tests.Services
             //Assert.AreEqual(33.33, monthlySumup.savings);
             //Assert.AreEqual(0, monthlySumup.savingsLastYear);
             //Assert.AreEqual(0, monthlySumup.expensesLastYear);
-            //Assert.AreEqual(17500, monthlySumup.extra);
             Assert.AreEqual(0.5, monthlySumup.MonthsWithoutPay);
         }
 
