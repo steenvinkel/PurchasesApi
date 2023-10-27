@@ -19,13 +19,13 @@ namespace Legacy.Dashboard
 
         public Dictionary<int, Dictionary<string, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
         {
-            var monthlyIncomeExpensesAndTax = _postingQueryRepository.GetMonthlyIncomeExpenseAndTax(userId);
+            var monthlyIncomeAndExpenses = _postingQueryRepository.GetMonthlyIncomeAndExpenses(userId);
             var monthlyAccountCategorySums = _monthlyAccountStatusRepository.GetAccumulatedCategorySums(userId);
 
-            var monthlyLedgers = CreateMonthlyLedgers(monthlyIncomeExpensesAndTax, monthlyAccountCategorySums);
+            var monthlyLedgers = CreateMonthlyLedgers(monthlyIncomeAndExpenses, monthlyAccountCategorySums);
 
             var monthAndYears = allMonthAndYears 
-                ? monthlyIncomeExpensesAndTax.Select(x => x.Key) 
+                ? monthlyIncomeAndExpenses.Select(x => x.Key) 
                 : new List<MonthAndYear> { MonthAndYear.Now };
 
             var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear.ToString(), monthAndYear => 
@@ -47,16 +47,16 @@ namespace Legacy.Dashboard
 
             var fireAges = returnRates
                 .ToDictionary(returnRate => returnRate, returnRate => 
-                calculator.FireAge(ledger.IncomeWithoutTaxAndPension, ledger.ExpensesWithoutTax, ledger.Fortune, returnRate, currentAge, pensionAge));
+                calculator.FireAge(ledger.IncomeWithoutPension, ledger.Expenses, ledger.Fortune, returnRate, currentAge, pensionAge));
 
             var dashboardInformation = new DashboardInformation
             {
-                MonthsLivableWithoutPay = calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.ExpensesWithoutTax),
-                SavingsRate = calculator.SavingsRate(ledger.IncomeWithoutTaxAndPension, ledger.ExpensesWithoutTax),
+                MonthsLivableWithoutPay = calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
+                SavingsRate = calculator.SavingsRate(ledger.IncomeWithoutPension, ledger.Expenses),
                 Fortune = ledger.Fortune,
                 FireAgePerReturnRate = fireAges,
-                IncomeWithoutTaxAndPension = ledger.IncomeWithoutTaxAndPension,
-                ExpensesWithoutTax = ledger.ExpensesWithoutTax,
+                IncomeWithoutPension = ledger.IncomeWithoutPension,
+                Expenses = ledger.Expenses,
                 NetworthIncreaseFortune = ledger.FortuneIncrease,
                 NetworthIncreaseInvestment = ledger.InvestmentIncrease,
                 VariableExpenses = ledger.VariableExpenses,
@@ -91,12 +91,10 @@ namespace Legacy.Dashboard
                 return new Ledger
                 {
                     Income = previousMonths.Average(x => x.Income),
-                    IncomeWithoutTaxAndPension = previousMonths.Average(x => x.IncomeWithoutTaxAndPension),
+                    IncomeWithoutPension = previousMonths.Average(x => x.IncomeWithoutPension),
                     Expenses = previousMonths.Average(x => x.Expenses),
-                    ExpensesWithoutTax = previousMonths.Average(x => x.ExpensesWithoutTax),
                     VariableExpenses = previousMonths.Average(x => x.VariableExpenses),
                     FixedExpenses = previousMonths.Average(x => x.FixedExpenses),
-                    Tax = previousMonths.Average(x => x.Tax),
                     OwnPension = previousMonths.Average(x => x.OwnPension),
                     Fortune = previousMonthlyLedger?.Fortune ?? 0,
                     FortuneIncrease = previousMonths.Average(x => x.FortuneIncrease),
@@ -105,17 +103,15 @@ namespace Legacy.Dashboard
             });
         }
 
-        private Dictionary<MonthAndYear, Ledger> CreateMonthlyLedgers(Dictionary<MonthAndYear, IncomeExpensesAndTax> monthlyIncomeExpensesAndTax, MonthlyAccountCategorySums monthlyAccountCategorySums)
+        private Dictionary<MonthAndYear, Ledger> CreateMonthlyLedgers(Dictionary<MonthAndYear, IncomeAndExpenses> monthlyIncomeAndExpenses, MonthlyAccountCategorySums monthlyAccountCategorySums)
         {
             var monthlyLedgers = new Dictionary<MonthAndYear, Ledger>();
-            foreach (var pair in monthlyIncomeExpensesAndTax)
+            foreach (var pair in monthlyIncomeAndExpenses)
             {
                 var monthAndYear = pair.Key;
-                var incomeExpensesAndTax = pair.Value;
 
                 var income = pair.Value.Income;
                 var expenses = pair.Value.Expenses;
-                var tax = pair.Value.Tax;
                 var variableExpenses = pair.Value.VariableExpenses;
                 var fixedExpenses = pair.Value.FixedExpenses;
                 var ownPension = monthlyAccountCategorySums.GetOwnPensionSavings(monthAndYear);
@@ -123,12 +119,10 @@ namespace Legacy.Dashboard
                 var values = new Ledger
                 {
                     Income = income,
-                    IncomeWithoutTaxAndPension = income - tax - ownPension,
+                    IncomeWithoutPension = income - ownPension,
                     Expenses = expenses,
-                    ExpensesWithoutTax = expenses - tax,
                     VariableExpenses = variableExpenses,
                     FixedExpenses = fixedExpenses,
-                    Tax = tax,
                     OwnPension = ownPension,
                     Fortune = summedFortunes,
                     FortuneIncrease = monthlyAccountCategorySums.GetFortune(monthAndYear),

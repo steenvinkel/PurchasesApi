@@ -39,11 +39,9 @@ namespace Legacy.Tests.Services
             {
                 new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "in", Sum = 25000 },
                 new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "out", Sum = 20000 },
-                new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "tax", Sum = 10000 },
                 new MonthlyTypeSum { MonthAndYear = (2019, 6), Type = "invest", Sum = 8.33 },
                 new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "in", Sum = 30000 },
                 new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "out", Sum = 25000 },
-                new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "tax", Sum = 10000 },
                 new MonthlyTypeSum { MonthAndYear = (2019, 7), Type = "invest", Sum = 16.67 }
             };
             Mock.Get(_postingQueryRepository).Setup(x => x.Sumup(userId))
@@ -73,9 +71,8 @@ namespace Legacy.Tests.Services
             Assert.IsNotNull(monthlySumup);
             Assert.AreEqual(25000, monthlySumup.In);
             Assert.AreEqual(20000, monthlySumup.Out);
-            Assert.AreEqual(10000, monthlySumup.PureOut);
             Assert.AreEqual(8.33, monthlySumup.Invest);
-            Assert.AreEqual(33.33, monthlySumup.Savings);
+            Assert.AreEqual(20, monthlySumup.Savings);
             Assert.AreEqual(0, monthlySumup.SavingsLastYear);
             Assert.AreEqual(0, monthlySumup.ExpensesLastYear);
             Assert.AreEqual(0, monthlySumup.MonthsWithoutPay);
@@ -84,12 +81,11 @@ namespace Legacy.Tests.Services
             Assert.IsNotNull(monthlySumup);
             Assert.AreEqual(30000, monthlySumup.In);
             Assert.AreEqual(25000, monthlySumup.Out);
-            Assert.AreEqual(15000, monthlySumup.PureOut);
             Assert.AreEqual(16.67, monthlySumup.Invest);
             //Assert.AreEqual(33.33, monthlySumup.savings);
             //Assert.AreEqual(0, monthlySumup.savingsLastYear);
             //Assert.AreEqual(0, monthlySumup.expensesLastYear);
-            Assert.AreEqual(0.5, monthlySumup.MonthsWithoutPay);
+            Assert.AreEqual(0.25, monthlySumup.MonthsWithoutPay);
         }
 
         private AccountStatus CreateAccountStatus(int amount, int year, int month)

@@ -1,5 +1,4 @@
 ﻿using Business.Constants;
-using Business.Customizations;
 using Business.Models;
 using DataAccess.Models;
 using Legacy.Models;
@@ -118,8 +117,6 @@ namespace DataAccess.Repositories
 
         public List<MonthlyTypeSum> Sumup(int userId)
         {
-            var taxSubcategoryIds = UserSpecifics.GetTaxSubcategoryIds(userId);
-
             var inAndOut = (from p in _context.PostingForUser(userId)
                             join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
                             join c in _context.Category on s.CategoryId equals c.CategoryId
@@ -132,22 +129,7 @@ namespace DataAccess.Repositories
                                 Sum = g.Sum()
                             }).ToList();
 
-            var tax = (from p in _context.PostingForUser(userId)
-                       join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
-                       join c in _context.Category on s.CategoryId equals c.CategoryId
-                       where c.Type == CategoryProperties.Type.Out
-                            && taxSubcategoryIds.Contains(s.SubcategoryId)
-                       group p.Amount by new { p.Date.Year, p.Date.Month } into g
-                       select new
-                       {
-                           g.Key.Year,
-                           g.Key.Month,
-                           Type = "tax",
-                           Sum = g.Sum()
-                       }
-                ).ToList();
-
-            return inAndOut.Union(tax).Select(x => new MonthlyTypeSum
+            return inAndOut.Select(x => new MonthlyTypeSum
             {
                 MonthAndYear = (x.Year, x.Month),
                 Type = x.Type,
@@ -234,25 +216,24 @@ namespace DataAccess.Repositories
                 .ToDictionary(g => g.Key, g => (g.FirstOrDefault(e => e.Type == "variable")?.Sum ?? 0, g.FirstOrDefault(e => e.Type == "fixed")?.Sum ?? 0));
         }
 
-        public Dictionary<MonthAndYear, IncomeExpensesAndTax> GetMonthlyIncomeExpenseAndTax(int userId)
+        public Dictionary<MonthAndYear, IncomeAndExpenses> GetMonthlyIncomeAndExpenses(int userId)
         {
             var monthlyTypeSums = Sumup(userId);
             var monthlyVariableAndFixedExpenses = GetMonthlyVariableAndFixedExpenses(userId);
 
-            var monthlyIncomeExpensesAndTaxes = new Dictionary<MonthAndYear, IncomeExpensesAndTax>();
+            var monthlyIncomeAndExpenses = new Dictionary<MonthAndYear, IncomeAndExpenses>();
             foreach(var typeSumsGroupedMonthly in monthlyTypeSums.GroupBy(x => x.MonthAndYear))
             {
-                var incomeExpensesAndTax = new IncomeExpensesAndTax
+                var incomeAndExpenses = new IncomeAndExpenses
                 {
                     Income = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0,
                     Expenses = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0,
-                    Tax = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0,
                     VariableExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].variable,
                     FixedExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].@fixed
                 };
-                monthlyIncomeExpensesAndTaxes.Add(typeSumsGroupedMonthly.Key, incomeExpensesAndTax);
+                monthlyIncomeAndExpenses.Add(typeSumsGroupedMonthly.Key, incomeAndExpenses);
             }
-            return monthlyIncomeExpensesAndTaxes;
+            return monthlyIncomeAndExpenses;
         }
     }
 }

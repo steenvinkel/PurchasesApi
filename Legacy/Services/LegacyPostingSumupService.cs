@@ -1,5 +1,4 @@
 ﻿using Business;
-using Business.Customizations;
 using Business.Models;
 using Legacy.ExtensionMethods;
 using Legacy.Models;
@@ -30,16 +29,12 @@ namespace Legacy.Services
             {
                 var monthAndYear = data.Key;
 
-                var @in = data.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0;
-                var @out = data.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0;
-                var tax = data.SingleOrDefault(x => x.Type == "tax")?.Sum ?? 0;
+                var income = data.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0;
+                var expenses = data.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0;
 
-                var pureIn = @in - tax;
-                var pureOut = @out - tax;
+                monthlyValues.Add(monthAndYear, (income, expenses));
 
-                monthlyValues.Add(monthAndYear, (pureIn, pureOut));
-
-                var savingProcentage = Calculate.SavingsRate(pureIn, pureOut);
+                var savingProcentage = Calculate.SavingsRate(income, expenses);
                 var savingsLastYear = SavingsRateLastYear(monthAndYear, monthlyValues);
 
                 var expensesLastYear = AverageExpensesLastYear(monthAndYear, monthlyValues);
@@ -48,9 +43,8 @@ namespace Legacy.Services
                 {
                     Year = monthAndYear.Year,
                     Month = monthAndYear.Month,
-                    In = Math.Round(@in, 2),
-                    Out = Math.Round(@out, 2),
-                    PureOut = Math.Round(pureOut, 2),
+                    In = Math.Round(income, 2),
+                    Out = Math.Round(expenses, 2),
                     Savings = Math.Round(savingProcentage, 2),
                     SavingsLastYear = Math.Round(savingsLastYear, 2),
                     ExpensesLastYear = Math.Round(expensesLastYear, 2),
