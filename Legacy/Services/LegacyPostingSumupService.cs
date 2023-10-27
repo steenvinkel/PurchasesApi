@@ -24,8 +24,6 @@ namespace Legacy.Services
             var monthlyResults = _postingQueryRepository.Sumup(userId)
                 .OrderBy(x => x.MonthAndYear.Year).ThenBy(x => x.MonthAndYear.Month).ThenBy(x => x.Type).ToList();
 
-            Dictionary<MonthAndYear, double> monthlySalery = GetMonthlySalery(userId);
-
             var monthlyValues = new Dictionary<MonthAndYear, (double pureInWithoutPension, double pureOut)>();
             var monthly = new List<LegacyMonthlySumup>();
             foreach (var data in monthlyResults.GroupBy(x => x.MonthAndYear))
@@ -41,20 +39,9 @@ namespace Legacy.Services
                 var pureIn = @in - tax;
                 var pureOut = @out - tax;
 
-                var pensionRate = UserSpecifics.GetPensionRate(userId, monthAndYear);
-                monthlySalery.TryGetValue(monthAndYear, out var salery);
-                var selfPaidPension = salery * pensionRate;
-
-                var pureInWithoutPension = @in - selfPaidPension - tax;
-                if (pureInWithoutPension < 0 && UserSpecifics.HideNegativeInWithoutPension(userId))
-                {
-                    pureInWithoutPension = 0;
-                }
-
-                monthlyValues.Add(monthAndYear, (pureInWithoutPension, pureOut));
+                monthlyValues.Add(monthAndYear, (pureIn, pureOut));
 
                 var savingProcentage = Calculate.SavingsRate(pureIn, pureOut);
-                var savingsWithoutPension = Calculate.SavingsRate(pureInWithoutPension, pureOut);
                 var savingsLastYear = SavingsRateLastYear(monthAndYear, monthlyValues);
 
                 var expensesLastYear = AverageExpensesLastYear(monthAndYear, monthlyValues);
@@ -67,7 +54,6 @@ namespace Legacy.Services
                     Out = Math.Round(@out, 2),
                     PureOut = Math.Round(pureOut, 2),
                     Savings = Math.Round(savingProcentage, 2),
-                    SavingsWithoutOwnContribution = Math.Round(savingsWithoutPension, 2),
                     SavingsLastYear = Math.Round(savingsLastYear, 2),
                     ExpensesLastYear = Math.Round(expensesLastYear, 2),
                     Extra = Math.Round(extra, 2),
@@ -77,20 +63,7 @@ namespace Legacy.Services
             return monthly;
         }
 
-        private Dictionary<MonthAndYear, double> GetMonthlySalery(int userId)
-        {
-            if (!UserSpecifics.ShouldCalculateSelfPaidPension(userId))
-            {
-                return new Dictionary<MonthAndYear, double>();
-            }
-
-            var subcategoryId = UserSpecifics.GetSalerySubcategoryId(userId);
-            var monthlySalery = _postingQueryRepository.GetSubcategoryMonthlySum(userId, subcategoryId);
-
-            return monthlySalery;
-        }
-
-        private double AverageExpensesLastYear(MonthAndYear month, Dictionary<MonthAndYear, (double pureInWithoutPension, double pureOut)> monthlyValues)
+        private double AverageExpensesLastYear(MonthAndYear month, Dictionary<MonthAndYear, (double pureIn, double pureOut)> monthlyValues)
         {
             var averageExpensesLastYear = GetAllMonthsLastYear(month)
                 .Where(monthAndYear => monthlyValues.ContainsKey(monthAndYear))
@@ -101,12 +74,12 @@ namespace Legacy.Services
             return averageExpensesLastYear;
         }
 
-        private double SavingsRateLastYear(MonthAndYear monthAndYear, Dictionary<MonthAndYear, (double pureInWithoutPension, double pureOut)> monthlyValues)
+        private double SavingsRateLastYear(MonthAndYear monthAndYear, Dictionary<MonthAndYear, (double pureIn, double pureOut)> monthlyValues)
         {
             var savingsRateLastYear = GetAllMonthsLastYear(monthAndYear)
                 .Where(month => monthlyValues.ContainsKey(month))
                 .Select(month => monthlyValues[month])
-                .Select(values => (In: values.pureInWithoutPension, Out: values.pureOut))
+                .Select(values => (In: values.pureIn, Out: values.pureOut))
                 .Aggregate((In: 0.0, Out: 0.0), (sum, values) => (In: sum.In + values.In, Out: sum.Out + values.Out))
                 .CalculateSavingsRate();
 

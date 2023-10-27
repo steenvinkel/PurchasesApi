@@ -17,11 +17,6 @@ namespace Business.Customizations
             return new List<int>();
         }
 
-        public static bool ShouldDailyPurchaseMonthBeRemoved(MonthAndYear monthAndYear, int userId)
-        {
-            return Rules.IsJcpSpecific(userId) && monthAndYear.IsEarlierThan(new MonthAndYear(2014, 9));
-        }
-
         public static double CreateExtraLine(int userId, MonthAndYear monthAndYear, double @in, double tax)
         {
             if (Rules.IsJcpSpecific(userId))
@@ -46,44 +41,6 @@ namespace Business.Customizations
             }
 
             return 0.0;
-        }
-
-        public static bool ShouldCalculateSelfPaidPension(int userId)
-        {
-            return Rules.IsJcpSpecific(userId);
-        }
-
-        public static double GetPensionRate(int userId, MonthAndYear monthAndYear)
-        {
-            if (!Rules.IsJcpSpecific(userId))
-            {
-                return 0;
-            }
-
-            if (monthAndYear.IsEarlierThan(new MonthAndYear(2016, 10)))
-            {
-                return 0;
-            }
-            else if (monthAndYear.IsEarlierThan(new MonthAndYear(2018,8)))
-            {
-                return 0.0525;
-            }
-            return 0.0625;
-        }
-
-        public static bool HideNegativeInWithoutPension(int userId)
-        {
-            return Rules.IsJcpSpecific(userId);
-        }
-
-        public static int GetSalerySubcategoryId(int userId)
-        {
-            if (Rules.IsJcpSpecific(userId))
-            {
-                return 2;
-            }
-
-            return 0;
         }
     }
 }

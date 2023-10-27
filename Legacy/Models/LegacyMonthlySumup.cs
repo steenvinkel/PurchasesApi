@@ -9,7 +9,6 @@
         public double PureOut { get; set; }
         public double Invest { get; set; }
         public double Savings { get; set; }
-        public double SavingsWithoutOwnContribution { get; set; }
         public double SavingsLastYear { get; set; }
         public double ExpensesLastYear { get; set; }
         public double MonthsWithoutPay { get; set; }

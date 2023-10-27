@@ -58,8 +58,6 @@ namespace DataAccess.Repositories
                     NumPurchases = dp.Num
                 }).ToList();
 
-            dailyPurchases.RemoveAll(p => UserSpecifics.ShouldDailyPurchaseMonthBeRemoved(new MonthAndYear(p.Year, p.Month), userId));
-
             return dailyPurchases.ToList();
         }
 

@@ -7,10 +7,8 @@ using Legacy.Repositories;
 using Legacy.Services;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Legacy.Tests.Services
 {
@@ -82,7 +80,6 @@ namespace Legacy.Tests.Services
             Assert.AreEqual(0, monthlySumup.ExpensesLastYear);
             Assert.AreEqual(17500, monthlySumup.Extra);
             Assert.AreEqual(0, monthlySumup.MonthsWithoutPay);
-            Assert.AreEqual(25.58, monthlySumup.SavingsWithoutOwnContribution);
 
             monthlySumup = result.SingleOrDefault(x => x.Year == 2019 && x.Month == 7);
             Assert.IsNotNull(monthlySumup);
@@ -95,7 +92,6 @@ namespace Legacy.Tests.Services
             //Assert.AreEqual(0, monthlySumup.expensesLastYear);
             //Assert.AreEqual(17500, monthlySumup.extra);
             Assert.AreEqual(0.5, monthlySumup.MonthsWithoutPay);
-            //Assert.AreEqual(25.58, monthlySumup.savingsWithoutOwnContribution);
         }
 
         private AccountStatus CreateAccountStatus(int amount, int year, int month)
