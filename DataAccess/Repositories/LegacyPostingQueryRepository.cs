@@ -61,23 +61,6 @@ namespace DataAccess.Repositories
             return dailyPurchases.ToList();
         }
 
-        public List<LegacyMonthlySumPerDay> GetMonthlyAverageDailyPurchases(int userId)
-        {
-            var taxSubcategoryIds = UserSpecifics.GetTaxSubcategoryIds(userId);
-
-            var sums = GetMonthlySubcategorySum(userId, 
-                category => category.Type == CategoryProperties.Type.Out,
-                subcategory => !taxSubcategoryIds.Contains(subcategory.SubcategoryId))
-                .Select(x => new LegacyMonthlySumPerDay
-                {
-                    Year = x.Key.Year,
-                    Month = x.Key.Month,
-                    SumPerDay = Math.Round(x.Value.Values.Sum() / DateTime.DaysInMonth(x.Key.Year, x.Key.Month), 2)
-                })
-                .ToList();
-            return sums;
-        }
-
         public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
         {
             var inTypes =

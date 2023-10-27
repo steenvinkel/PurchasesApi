@@ -70,16 +70,6 @@ namespace Purchases.Controllers
             return Ok(dailyPurchases);
         }
 
-        [HttpGet("SumPerDay")]
-        public ActionResult SumPerDay()
-        {
-            var userId = HttpContext.GetUserId();
-
-            var sumPerDay = _postingQueryRepository.GetMonthlyAverageDailyPurchases(userId);
-
-            return Ok(sumPerDay);
-        }
-
         [HttpGet("MonthlyAccountStatus")]
         public ActionResult Get()
         {
