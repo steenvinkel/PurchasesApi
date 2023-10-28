@@ -6,7 +6,6 @@ using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace DataAccess.Repositories
 {
@@ -17,22 +16,6 @@ namespace DataAccess.Repositories
         public LegacyPostingQueryRepository(PurchasesContext context)
         {
             _context = context;
-        }
-
-        private Dictionary<MonthAndYear, Dictionary<int, double>> GetMonthlySubcategorySum(int userId, Expression<Func<Category, bool>> categoryFilter, Expression<Func<Subcategory, bool>> subcategoryFilter)
-        {
-            var sums = (from P in _context.PostingForUser(userId)
-                        join S in _context.Subcategory.Where(subcategoryFilter) on P.SubcategoryId equals S.SubcategoryId
-                        join C in _context.Category.Where(categoryFilter) on S.CategoryId equals C.CategoryId
-                        group P by new { P.Date.Year, P.Date.Month, S.SubcategoryId } into g
-                        select new
-                        {
-                            MonthAndYear = new MonthAndYear(g.Key.Year, g.Key.Month),
-                            g.Key.SubcategoryId,
-                            Sum = g.Sum(posting => posting.Amount)
-                        }).ToList();
-
-            return sums.GroupBy(x => x.MonthAndYear).ToDictionary(x => x.Key, x => x.ToDictionary(y => y.SubcategoryId, y => y.Sum));
         }
 
         public List<LegacyDailyNum> GetDailyPurchases(int userId)
