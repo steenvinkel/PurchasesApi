@@ -40,6 +40,7 @@ namespace IntegrationTests.Controllers
             // Arrange
             var postingToSave = _fixture.Create<LegacyPosting>();
             postingToSave.Posting_id = 0;
+            postingToSave.Description = _factory.SubCategoryName;
 
             // Act
             var postResponse = await _client.PostAsync("/api/LegacyPosting", SerializeToStringContent(postingToSave));

@@ -41,7 +41,6 @@ namespace DataAccess.Repositories
             {
                 UserId = userId,
                 SubcategoryId = lossSubcategoryId,
-                Description = "",
                 Date = monthAndYear.LastDayOfMonth(),
                 Latitude = null,
                 Longitude = null,

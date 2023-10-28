@@ -23,7 +23,7 @@ namespace DataAccess.Repositories
                                on posting.SubcategoryId equals subcategory.SubcategoryId into ps
                            from sub in ps.DefaultIfEmpty()
                            orderby posting.CreatedOn descending
-                           select new { posting, Description = sub.Name  }
+                           select new { posting, SubCategoryName = sub.Name  }
                            ).Take(200).ToList();
 
             return postings.Select(p => new LegacyPosting
@@ -34,22 +34,23 @@ namespace DataAccess.Repositories
                 Latitude = p.posting.Latitude,
                 Longitude = p.posting.Longitude,
                 Accuracy = p.posting.Accuracy,
-                Description = p.Description ?? p.posting.Description ?? string.Empty
+                Description = p.SubCategoryName
             }).ToList();
         }
 
         public LegacyPosting Put(LegacyPosting posting, int userId)
         {
             var existingPosting = _context.PostingForUser(userId).FirstOrDefault(p => p.PostingId == posting.Posting_id);
+
             if (existingPosting == null)
             {
                 throw new Exception($"Posting ({posting.Posting_id}) does not exists");
             }
 
-            var subcategoryId = GetSubcategoryIdFromName(userId, posting.Description);
+            var subCategoryName = posting.Description;
+            var subcategoryId = GetSubcategoryIdFromName(userId, subCategoryName);
 
             existingPosting.Amount = posting.Amount;
-            existingPosting.Description = subcategoryId == null ? posting.Description : "";
             existingPosting.SubcategoryId = subcategoryId;
             existingPosting.Date = posting.Date;
             existingPosting.Longitude = posting.Longitude;
@@ -58,18 +59,18 @@ namespace DataAccess.Repositories
 
             _context.SaveChanges();
 
-            return MapToLegacyPosting(posting.Description, existingPosting);
+            return MapToLegacyPosting(subCategoryName, existingPosting);
 
         }
 
         public LegacyPosting Post(LegacyPosting posting, int userId)
         {
-            var subcategoryId = GetSubcategoryIdFromName(userId, posting.Description);
+            var subCategoryName = posting.Description;
+            var subcategoryId = GetSubcategoryIdFromName(userId, subCategoryName) ?? throw new ArgumentException($"The subcategory could not be found by name {subCategoryName}", nameof(posting));
 
             var newPosting = new Posting
             {
                 Amount = posting.Amount,
-                Description = subcategoryId == null ? posting.Description : "",
                 Date = posting.Date.Date,
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
@@ -82,10 +83,10 @@ namespace DataAccess.Repositories
             _context.Posting.Add(newPosting);
             _context.SaveChanges();
 
-            return MapToLegacyPosting(posting.Description, newPosting);
+            return MapToLegacyPosting(subCategoryName, newPosting);
         }
 
-        private static LegacyPosting MapToLegacyPosting(string description, Posting posting)
+        private static LegacyPosting MapToLegacyPosting(string subCategoryName, Posting posting)
         {
             return new LegacyPosting
             {
@@ -95,7 +96,7 @@ namespace DataAccess.Repositories
                 Longitude = posting.Longitude,
                 Latitude = posting.Latitude,
                 Accuracy = posting.Accuracy,
-                Description = posting.SubcategoryId != null ? description : posting.Description ?? string.Empty
+                Description = subCategoryName
             };
         }
 

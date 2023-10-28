@@ -171,10 +171,6 @@ namespace DataAccess.Models
                     .HasColumnName("date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.Description)
-                    .HasColumnName("description")
-                    .HasColumnType("text");
-
                 entity.Property(e => e.Latitude).HasColumnName("latitude");
 
                 entity.Property(e => e.Longitude).HasColumnName("longitude");
