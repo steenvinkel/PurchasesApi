@@ -23,7 +23,7 @@ namespace Legacy.Services
             var monthlyResults = _postingQueryRepository.Sumup(userId)
                 .OrderBy(x => x.MonthAndYear.Year).ThenBy(x => x.MonthAndYear.Month).ThenBy(x => x.Type).ToList();
 
-            var monthlyValues = new Dictionary<MonthAndYear, (double pureInWithoutPension, double pureOut)>();
+            var monthlyValues = new Dictionary<MonthAndYear, (double pureIn, double pureOut)>();
             var monthly = new List<LegacyMonthlySumup>();
             foreach (var data in monthlyResults.GroupBy(x => x.MonthAndYear))
             {

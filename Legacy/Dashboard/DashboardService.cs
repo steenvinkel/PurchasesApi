@@ -47,15 +47,15 @@ namespace Legacy.Dashboard
 
             var fireAges = returnRates
                 .ToDictionary(returnRate => returnRate, returnRate => 
-                calculator.FireAge(ledger.IncomeWithoutPension, ledger.Expenses, ledger.Fortune, returnRate, currentAge, pensionAge));
+                calculator.FireAge(ledger.Income, ledger.Expenses, ledger.Fortune, returnRate, currentAge, pensionAge));
 
             var dashboardInformation = new DashboardInformation
             {
                 MonthsLivableWithoutPay = calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
-                SavingsRate = calculator.SavingsRate(ledger.IncomeWithoutPension, ledger.Expenses),
+                SavingsRate = calculator.SavingsRate(ledger.Income, ledger.Expenses),
                 Fortune = ledger.Fortune,
                 FireAgePerReturnRate = fireAges,
-                IncomeWithoutPension = ledger.IncomeWithoutPension,
+                Income = ledger.Income,
                 Expenses = ledger.Expenses,
                 NetworthIncreaseFortune = ledger.FortuneIncrease,
                 NetworthIncreaseInvestment = ledger.InvestmentIncrease,
@@ -91,11 +91,9 @@ namespace Legacy.Dashboard
                 return new Ledger
                 {
                     Income = previousMonths.Average(x => x.Income),
-                    IncomeWithoutPension = previousMonths.Average(x => x.IncomeWithoutPension),
                     Expenses = previousMonths.Average(x => x.Expenses),
                     VariableExpenses = previousMonths.Average(x => x.VariableExpenses),
                     FixedExpenses = previousMonths.Average(x => x.FixedExpenses),
-                    OwnPension = previousMonths.Average(x => x.OwnPension),
                     Fortune = previousMonthlyLedger?.Fortune ?? 0,
                     FortuneIncrease = previousMonths.Average(x => x.FortuneIncrease),
                     InvestmentIncrease = previousMonths.Average(x => x.InvestmentIncrease)
@@ -114,16 +112,13 @@ namespace Legacy.Dashboard
                 var expenses = pair.Value.Expenses;
                 var variableExpenses = pair.Value.VariableExpenses;
                 var fixedExpenses = pair.Value.FixedExpenses;
-                var ownPension = monthlyAccountCategorySums.GetOwnPensionSavings(monthAndYear);
-                var summedFortunes = monthlyAccountCategorySums.GetFortunesWithoutPension(monthAndYear);
+                var summedFortunes = monthlyAccountCategorySums.GetCombinedFortune(monthAndYear);
                 var values = new Ledger
                 {
                     Income = income,
-                    IncomeWithoutPension = income - ownPension,
                     Expenses = expenses,
                     VariableExpenses = variableExpenses,
                     FixedExpenses = fixedExpenses,
-                    OwnPension = ownPension,
                     Fortune = summedFortunes,
                     FortuneIncrease = monthlyAccountCategorySums.GetFortune(monthAndYear),
                     InvestmentIncrease = monthlyAccountCategorySums.GetInvestment(monthAndYear),
