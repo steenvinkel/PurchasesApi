@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Business.Repositories;
 using Legacy.Repositories;
-using Legacy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
@@ -19,25 +18,11 @@ namespace Purchases.Controllers
         private readonly ISubCategoryRepository _subCategoryRepository;
         private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
-        // Mixed
-        private readonly ILegacySumupService _sumupService;
-
-        public LegacyGraphController(ILegacySumupService sumupService, ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository, ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
+        public LegacyGraphController(ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository, ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
         {
-            _sumupService = sumupService;
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
             _postingQueryRepository = graphRepository;
             _subCategoryRepository = subCategoryRepository;
-        }
-
-        [HttpGet("Sumup")]
-        public ActionResult Sumup()
-        {
-            var userId = HttpContext.GetUserId();
-
-            var sumup = _sumupService.Sumup(userId);
-
-            return Ok(sumup);
         }
 
         [HttpGet("Summary")]

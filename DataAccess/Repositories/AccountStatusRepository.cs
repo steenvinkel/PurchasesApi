@@ -1,10 +1,7 @@
-﻿using Business.Models;
-using Business.Repositories;
+﻿using Business.Repositories;
 using DataAccess.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace DataAccess.Repositories
 {

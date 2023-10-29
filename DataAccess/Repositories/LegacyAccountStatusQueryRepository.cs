@@ -64,27 +64,6 @@ namespace DataAccess.Repositories
             return accountCategories;
         }
 
-        public Dictionary<MonthAndYear, double> CalculateSummedFortunes(int userId)
-        {
-            var (_, monthlyAccountStatuses) = MonthlyAccountStatus(userId);
-            var summedFortunes = new Dictionary<MonthAndYear, double>();
-            foreach (var status in monthlyAccountStatuses)
-            {
-                var amount = 0.0;
-                foreach (var pair in status.Categories)
-                {
-                    var category = pair.Value;
-                    if (category.Name == "Fortune" || category.Name == "Investment")
-                    {
-                        amount += category.Amount;
-                    }
-                }
-                summedFortunes.Add(new MonthAndYear((int)status.Year, (int)status.Month), amount);
-            }
-
-            return summedFortunes;
-        }
-
         public (double StartSum, double EndSum) StartAndEndOfMonthAccountStatusSum(int userId, MonthAndYear monthAndYear)
         {
             var monthlyAccountStatuses = _context.AccountStatus

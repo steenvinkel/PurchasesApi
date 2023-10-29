@@ -29,6 +29,13 @@ namespace IntegrationTests.Controllers
             _fixture = new Fixture();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _client.Dispose();
+            _factory.Dispose();
+        }
+
         public static StringContent SerializeToStringContent(object obj)
         {
             return new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");

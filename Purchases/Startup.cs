@@ -44,9 +44,6 @@ namespace Purchases
             services.AddScoped<ILegacyPostingRepository, LegacyPostingRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILegacyPostingSumupService, LegacyPostingSumupService>();
-            services.AddScoped<ILegacyAccountStatusSumupService, LegacyAccountStatusSumupService>();
-            services.AddScoped<ILegacySumupService, LegacySumupService>();
             services.AddScoped<ILegacyAccountStatusQueryRepository, LegacyMonthlyAccountStatusRepository>();
             services.AddScoped<ILegacyAccountStatusRepository, LegacyAccountStatusRepository>();
             services.AddScoped<ILegacyPostingQueryRepository, LegacyPostingQueryRepository>();
