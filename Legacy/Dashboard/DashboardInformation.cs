@@ -8,6 +8,7 @@ namespace Legacy.Dashboard
         public double MonthsLivableWithoutPay { get; set; }
         public double SavingsRate { get; set; }
         public double Fortune { get; set; }
+        public double InvestedFortune { get; set; }
         public double Income { get; set; }
         public double Expenses { get; set; }
         public double NetworthIncreaseFortune { get; set; }

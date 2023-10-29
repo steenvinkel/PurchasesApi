@@ -18,6 +18,13 @@ namespace Business.Models
             return categories?.Select(pair => pair.Value).Sum() ?? 0;
         }
 
+        public double GetInvestedFortune(MonthAndYear monthAndYear)
+        {
+            TryGetValue(monthAndYear, out var categories);
+
+            return categories?.Where(pair => pair.Key == Investment).Select(pair => pair.Value).Sum() ?? 0;
+        }
+
         public double GetFortune(MonthAndYear monthAndYear)
         {
             TryGetValue(monthAndYear, out var categories);

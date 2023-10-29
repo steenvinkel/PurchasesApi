@@ -54,6 +54,7 @@ namespace Legacy.Dashboard
                 MonthsLivableWithoutPay = calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
                 SavingsRate = calculator.SavingsRate(ledger.Income, ledger.Expenses),
                 Fortune = ledger.Fortune,
+                InvestedFortune = ledger.InvestedFortune,
                 FireAgePerReturnRate = fireAges,
                 Income = ledger.Income,
                 Expenses = ledger.Expenses,
@@ -95,6 +96,7 @@ namespace Legacy.Dashboard
                     VariableExpenses = previousMonths.Average(x => x.VariableExpenses),
                     FixedExpenses = previousMonths.Average(x => x.FixedExpenses),
                     Fortune = previousMonthlyLedger?.Fortune ?? 0,
+                    InvestedFortune = previousMonthlyLedger?.InvestedFortune ?? 0,
                     FortuneIncrease = previousMonths.Average(x => x.FortuneIncrease),
                     InvestmentIncrease = previousMonths.Average(x => x.InvestmentIncrease)
                 };
@@ -113,6 +115,7 @@ namespace Legacy.Dashboard
                 var variableExpenses = pair.Value.VariableExpenses;
                 var fixedExpenses = pair.Value.FixedExpenses;
                 var summedFortunes = monthlyAccountCategorySums.GetCombinedFortune(monthAndYear);
+                var investedFortune = monthlyAccountCategorySums.GetInvestedFortune(monthAndYear);
                 var values = new Ledger
                 {
                     Income = income,
@@ -120,6 +123,7 @@ namespace Legacy.Dashboard
                     VariableExpenses = variableExpenses,
                     FixedExpenses = fixedExpenses,
                     Fortune = summedFortunes,
+                    InvestedFortune = investedFortune,
                     FortuneIncrease = monthlyAccountCategorySums.GetFortune(monthAndYear),
                     InvestmentIncrease = monthlyAccountCategorySums.GetInvestment(monthAndYear),
                 };

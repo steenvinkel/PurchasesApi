@@ -7,6 +7,7 @@
         public double VariableExpenses { get; set; } = 0;
         public double FixedExpenses { get; set; } = 0;
         public double Fortune { get; set; } = 0;
+        public double InvestedFortune { get; set; } = 0;
         public double FortuneIncrease { get; set; } = 0;
         public double InvestmentIncrease { get; set; } = 0;
     }
