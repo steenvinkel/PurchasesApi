@@ -26,17 +26,11 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var subcategories = _subCategoryRepository.GetList(userId)
-                .Select(sc => new { sc.Name, Subcategory_id = sc.Id, Category_id = sc.CategoryId } )
-                .GroupBy(x => x.Category_id)
-                .ToDictionary(x => x.Key);
-
             var (categories, summary) = _postingQueryRepository.Summary(userId);
 
             return Ok(new
             {
                 categories,
-                subcategories,
                 summary
             });
         }
