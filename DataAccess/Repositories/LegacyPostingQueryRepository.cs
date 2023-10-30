@@ -98,28 +98,6 @@ namespace DataAccess.Repositories
             return result;
         }
 
-        public List<MonthlyTypeSum> Sumup(int userId)
-        {
-            var inAndOut = (from p in _context.PostingForUser(userId)
-                            join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
-                            join c in _context.Category on s.CategoryId equals c.CategoryId
-                            group p.Amount by new { p.Date.Year, p.Date.Month, c.Type } into g
-                            select new
-                            {
-                                g.Key.Year,
-                                g.Key.Month,
-                                g.Key.Type,
-                                Sum = g.Sum()
-                            }).ToList();
-
-            return inAndOut.Select(x => new MonthlyTypeSum
-            {
-                MonthAndYear = (x.Year, x.Month),
-                Type = x.Type,
-                Sum = x.Sum,
-            }).ToList();
-        }
-
         public (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId)
         {
             var categories = _context.CategoryForUser(userId)
@@ -152,17 +130,6 @@ namespace DataAccess.Repositories
             return (categories, summaryMap);
         }
 
-        public Dictionary<MonthAndYear, double> GetSubcategoryMonthlySum(int userId, int subcategoryId)
-        {
-            var monthlySum = _context.PostingForUser(userId)
-                .Where(posting => posting.SubcategoryId == subcategoryId)
-                .GroupBy(posting => new { posting.Date.Year, posting.Date.Month })
-                .Select(pair => new {pair.Key, Sum = pair.Sum(x => x.Amount)})
-                .ToDictionary(a => new MonthAndYear(a.Key.Year, a.Key.Month), a => a.Sum);
-
-            return monthlySum;
-        }
-
         public double GetMonthlyChange(int userId, MonthAndYear monthAndYear)
         {
             return (from P in _context.PostingForUser(userId)
@@ -183,40 +150,31 @@ namespace DataAccess.Repositories
                     select S.SubcategoryId).Single();
         }
 
-        public Dictionary<MonthAndYear, (double variable, double @fixed)> GetMonthlyVariableAndFixedExpenses(int userId)
-        {
-            var expenses = (from p in _context.PostingForUser(userId)
-                            join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId where s.Type != null
-                            group p.Amount by new { p.Date.Year, p.Date.Month, s.Type } into g
-                            select new
-                            {
-                                MonthAndYear = new MonthAndYear(g.Key.Year, g.Key.Month),
-                                g.Key.Type,
-                                Sum = g.Sum()
-                            }).ToList();
-
-            return expenses.GroupBy(e => e.MonthAndYear)
-                .ToDictionary(g => g.Key, g => (g.FirstOrDefault(e => e.Type == "variable")?.Sum ?? 0, g.FirstOrDefault(e => e.Type == "fixed")?.Sum ?? 0));
-        }
-
         public Dictionary<MonthAndYear, IncomeAndExpenses> GetMonthlyIncomeAndExpenses(int userId)
         {
-            var monthlyTypeSums = Sumup(userId);
-            var monthlyVariableAndFixedExpenses = GetMonthlyVariableAndFixedExpenses(userId);
+            var incomeAndExpenses =
+                (from p in _context.PostingForUser(userId)
+                 join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
+                 join c in _context.Category on s.CategoryId equals c.CategoryId
+                 group p.Amount by new { p.Date.Year, p.Date.Month, c.Type, SubType = s.Type } into g
+                 select new
+                 {
+                     MonthAndYear = new MonthAndYear(g.Key.Year, g.Key.Month),
+                     g.Key.Type,
+                     g.Key.SubType,
+                     Sum = g.Sum()
+                 })
+                    .ToList()
+                    .GroupBy(x => x.MonthAndYear)
+                    .ToDictionary(x => x.Key, x => new IncomeAndExpenses
+                    {
+                        Income = x.Where(y => y.Type == "in").Sum(y => y.Sum),
+                        Expenses = x.Where(y => y.Type == "out").Sum(y => y.Sum),
+                        VariableExpenses = x.Where(y => y.SubType == "variable").Sum(y => y.Sum),
+                        FixedExpenses = x.Where(y => y.SubType == "fixed").Sum(y => y.Sum),
+                    });
 
-            var monthlyIncomeAndExpenses = new Dictionary<MonthAndYear, IncomeAndExpenses>();
-            foreach(var typeSumsGroupedMonthly in monthlyTypeSums.GroupBy(x => x.MonthAndYear))
-            {
-                var incomeAndExpenses = new IncomeAndExpenses
-                {
-                    Income = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "in")?.Sum ?? 0,
-                    Expenses = typeSumsGroupedMonthly.SingleOrDefault(x => x.Type == "out")?.Sum ?? 0,
-                    VariableExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].variable,
-                    FixedExpenses = monthlyVariableAndFixedExpenses[typeSumsGroupedMonthly.Key].@fixed
-                };
-                monthlyIncomeAndExpenses.Add(typeSumsGroupedMonthly.Key, incomeAndExpenses);
-            }
-            return monthlyIncomeAndExpenses;
+            return incomeAndExpenses;
         }
     }
 }
