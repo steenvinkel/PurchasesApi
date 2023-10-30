@@ -19,7 +19,7 @@ namespace Business.Tests.Dashboard
 
         }
 
-        private static object[] FortuneAndInvestmentScenarios = new object[] 
+        private static readonly object[] FortuneAndInvestmentScenarios = new object[] 
         {
             new object[]{ new Dictionary<MonthAndYear, Dictionary<string, double>>(), new MonthAndYear(2019, 9), 0 },
             new object[]{ new Dictionary<MonthAndYear, Dictionary<string, double>>

@@ -40,12 +40,9 @@ namespace DataAccess.Repositories
 
         public LegacyPosting Put(LegacyPosting posting, int userId)
         {
-            var existingPosting = _context.PostingForUser(userId).FirstOrDefault(p => p.PostingId == posting.Posting_id);
-
-            if (existingPosting == null)
-            {
-                throw new Exception($"Posting ({posting.Posting_id}) does not exists");
-            }
+            var existingPosting = _context
+                .PostingForUser(userId)
+                .FirstOrDefault(p => p.PostingId == posting.Posting_id) ?? throw new Exception($"Posting ({posting.Posting_id}) does not exists");
 
             var subCategoryName = posting.Description;
             var subcategoryId = GetSubcategoryIdFromName(userId, subCategoryName);

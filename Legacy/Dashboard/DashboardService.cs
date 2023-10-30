@@ -28,31 +28,30 @@ namespace Legacy.Dashboard
                 ? monthlyIncomeAndExpenses.Select(x => x.Key) 
                 : new List<MonthAndYear> { MonthAndYear.Now };
 
-            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear.ToString(), monthAndYear => 
+            var dashboards = monthsInDashboard.ToDictionary(numMonths => numMonths, numMonths => monthAndYears.ToDictionary(monthAndYear => monthAndYear.ToString(), monthAndYear =>
                     CalculateDashboard(monthAndYear, returnRates, currentAge, pensionAge, numMonths, monthlyLedgers)));
 
             return dashboards;
         }
 
-        private DashboardInformation CalculateDashboard(MonthAndYear currentMonthAndYear, List<double> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
+        private static DashboardInformation CalculateDashboard(MonthAndYear currentMonthAndYear, List<double> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
         {
             var ledger = CalculateAverageLedger(monthlyLedgers, numMonths, currentMonthAndYear);
             return CalculateDashboard(ledger, currentAge, pensionAge, returnRates);
         }
 
-        private DashboardInformation CalculateDashboard(Ledger ledger, int currentAge, int pensionAge, List<double> returnRates)
+        private static DashboardInformation CalculateDashboard(Ledger ledger, int currentAge, int pensionAge, List<double> returnRates)
         {
             var yearToPension = pensionAge - currentAge;
-            var calculator = new Calculator();
 
             var fireAges = returnRates
-                .ToDictionary(returnRate => returnRate, returnRate => 
-                calculator.FireAge(ledger.Income, ledger.Expenses, ledger.Fortune, returnRate, currentAge, pensionAge));
+                .ToDictionary(returnRate => returnRate, returnRate =>
+                Calculator.FireAge(ledger.Income, ledger.Expenses, ledger.Fortune, returnRate, currentAge, pensionAge));
 
             var dashboardInformation = new DashboardInformation
             {
-                MonthsLivableWithoutPay = calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
-                SavingsRate = calculator.SavingsRate(ledger.Income, ledger.Expenses),
+                MonthsLivableWithoutPay = Calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
+                SavingsRate = Calculator.SavingsRate(ledger.Income, ledger.Expenses),
                 Fortune = ledger.Fortune,
                 InvestedFortune = ledger.InvestedFortune,
                 FireAgePerReturnRate = fireAges,
@@ -67,12 +66,12 @@ namespace Legacy.Dashboard
             return dashboardInformation;
         }
 
-        private Ledger CalculateAverageLedger(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths, MonthAndYear currentMonthAndYear)
+        private static Ledger CalculateAverageLedger(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths, MonthAndYear currentMonthAndYear)
         {
             return CalculateAverageLedgers(monthlyLedgers, numMonths)[currentMonthAndYear];
         }
 
-        private Dictionary<MonthAndYear, Ledger> CalculateAverageLedgers(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths)
+        private static Dictionary<MonthAndYear, Ledger> CalculateAverageLedgers(Dictionary<MonthAndYear, Ledger> monthlyLedgers, int numMonths)
         {
             if (numMonths == 0)
             {
@@ -103,7 +102,7 @@ namespace Legacy.Dashboard
             });
         }
 
-        private Dictionary<MonthAndYear, Ledger> CreateMonthlyLedgers(Dictionary<MonthAndYear, IncomeAndExpenses> monthlyIncomeAndExpenses, MonthlyAccountCategorySums monthlyAccountCategorySums)
+        private static Dictionary<MonthAndYear, Ledger> CreateMonthlyLedgers(Dictionary<MonthAndYear, IncomeAndExpenses> monthlyIncomeAndExpenses, MonthlyAccountCategorySums monthlyAccountCategorySums)
         {
             var monthlyLedgers = new Dictionary<MonthAndYear, Ledger>();
             foreach (var pair in monthlyIncomeAndExpenses)

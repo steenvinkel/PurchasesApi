@@ -9,7 +9,7 @@ namespace Business.Models
         public int Year { get; }
         public int Month { get; }
 
-        public static MonthAndYear Now => new MonthAndYear(DateTime.Now);
+        public static MonthAndYear Now => new(DateTime.Now);
 
         public MonthAndYear(DateTime dateTime)
         {

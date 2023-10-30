@@ -65,7 +65,7 @@ namespace IntegrationTests.Controllers
             var postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings + 1, postings.Count());
+            Assert.AreEqual(NumSeededPostings + 1, postings.Count);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace IntegrationTests.Controllers
             var postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings, postings.Count());
+            Assert.AreEqual(NumSeededPostings, postings.Count);
 
 
             // Arrange
@@ -100,7 +100,7 @@ namespace IntegrationTests.Controllers
             postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings + 1, postings.Count());
+            Assert.AreEqual(NumSeededPostings + 1, postings.Count);
 
             // Arrange
             var postingToUpdate = _fixture.Create<LegacyPosting>();

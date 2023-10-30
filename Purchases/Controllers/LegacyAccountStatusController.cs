@@ -32,9 +32,7 @@ namespace Purchases.Controllers
         {
             var accountStatuses = _accountStatusRepository.Get(HttpContext.GetUserId());
 
-            var mapper = new AccountStatusMapper();
-
-            return mapper.Map(accountStatuses);
+            return AccountStatusMapper.Map(accountStatuses);
         }
 
         [HttpPost]
@@ -80,11 +78,11 @@ namespace Purchases.Controllers
         {
             if (accountStatus.Account_status_id == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(accountStatus.Account_status_id));
+                throw new ArgumentOutOfRangeException(nameof(accountStatus), $"The parameter {nameof(accountStatus.Account_status_id)} cannot be zero");
             }
             if (accountStatus.Account_id == 0)
             {
-                throw new ArgumentException(nameof(accountStatus.Account_id));
+                throw new ArgumentOutOfRangeException(nameof(accountStatus), $"The parameter {nameof(accountStatus.Account_id)} cannot be zero");
             }
         }
 
@@ -92,11 +90,11 @@ namespace Purchases.Controllers
         {
             if (accountStatus.Account_status_id != 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(accountStatus.Account_status_id));
+                throw new ArgumentOutOfRangeException(nameof(accountStatus), $"The parameter {nameof(accountStatus.Account_status_id)} should be zero");
             }
             if (accountStatus.Account_id == 0)
             {
-                throw new ArgumentException(nameof(accountStatus.Account_id));
+                throw new ArgumentOutOfRangeException(nameof(accountStatus), $"The parameter {nameof(accountStatus.Account_id)} cannot be zero");
             }
         }
     }

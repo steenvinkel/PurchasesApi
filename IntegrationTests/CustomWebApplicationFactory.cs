@@ -40,65 +40,64 @@ namespace Purchases.IntegrationTests
 
                 // Create a scope to obtain a reference to the database
                 // context (ApplicationDbContext).
-                using (var scope = sp.CreateScope())
+                using var scope = sp.CreateScope();
+
+                var scopedServices = scope.ServiceProvider;
+                var db = scopedServices.GetRequiredService<PurchasesContext>();
+                var logger = scopedServices
+                    .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+
+                // Ensure the database is created.
+                db.Database.EnsureCreated();
+
+                try
                 {
-                    var scopedServices = scope.ServiceProvider;
-                    var db = scopedServices.GetRequiredService<PurchasesContext>();
-                    var logger = scopedServices
-                        .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                    // Seed the database with test data.
+                    var fixture = new Fixture();
+                    var user = fixture.Create<User>();
+                    user.AuthExpire = DateTime.Now.AddDays(99);
+                    AuthToken = user.AuthToken;
+                    db.User.Add(user);
 
-                    // Ensure the database is created.
-                    db.Database.EnsureCreated();
+                    var category = fixture.Create<Category>();
+                    category.UserId = user.UserId;
+                    category.Type = "in";
+                    db.Category.Add(category);
 
-                    try
-                    {
-                        // Seed the database with test data.
-                        var fixture = new Fixture();
-                        var user = fixture.Create<User>();
-                        user.AuthExpire = DateTime.Now.AddDays(99);
-                        AuthToken = user.AuthToken;
-                        db.User.Add(user);
+                    var subcategory = fixture.Create<Subcategory>();
+                    subcategory.CategoryId = category.CategoryId;
+                    db.Subcategory.Add(subcategory);
+                    SubCategoryName = subcategory.Name;
 
-                        var category = fixture.Create<Category>();
-                        category.UserId = user.UserId;
-                        category.Type = "in";
-                        db.Category.Add(category);
+                    var posting = fixture.Create<Posting>();
+                    posting.Amount = 10000;
+                    posting.SubcategoryId = subcategory.SubcategoryId;
+                    posting.UserId = user.UserId;
+                    db.Posting.Add(posting);
 
-                        var subcategory = fixture.Create<Subcategory>();
-                        subcategory.CategoryId = category.CategoryId;
-                        db.Subcategory.Add(subcategory);
-                        SubCategoryName = subcategory.Name;
+                    var posting2 = fixture.Create<Posting>();
+                    posting2.Amount = 10000;
+                    posting2.SubcategoryId = subcategory.SubcategoryId;
+                    posting2.UserId = user.UserId;
+                    db.Posting.Add(posting2);
 
-                        var posting = fixture.Create<Posting>();
-                        posting.Amount = 10000;
-                        posting.SubcategoryId = subcategory.SubcategoryId;
-                        posting.UserId = user.UserId;
-                        db.Posting.Add(posting);
+                    var accountStatus = fixture.Create<AccountStatus>();
+                    accountStatus.Date = posting.Date;
+                    accountStatus.Amount = 10000;
+                    accountStatus.UserId = user.UserId;
+                    db.AccountStatus.Add(accountStatus);
 
-                        var posting2 = fixture.Create<Posting>();
-                        posting2.Amount = 10000;
-                        posting2.SubcategoryId = subcategory.SubcategoryId;
-                        posting2.UserId = user.UserId;
-                        db.Posting.Add(posting2);
+                    var accountStatus2 = fixture.Create<AccountStatus>();
+                    accountStatus2.Date = posting2.Date;
+                    accountStatus2.Amount = 10000;
+                    accountStatus2.UserId = user.UserId;
+                    db.AccountStatus.Add(accountStatus2);
 
-                        var accountStatus = fixture.Create<AccountStatus>();
-                        accountStatus.Date = posting.Date;
-                        accountStatus.Amount = 10000;
-                        accountStatus.UserId = user.UserId;
-                        db.AccountStatus.Add(accountStatus);
-
-                        var accountStatus2 = fixture.Create<AccountStatus>();
-                        accountStatus2.Date = posting2.Date;
-                        accountStatus2.Amount = 10000;
-                        accountStatus2.UserId = user.UserId;
-                        db.AccountStatus.Add(accountStatus2);
-
-                        db.SaveChanges();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, $"An error occurred seeding the database with test messages. Error: {ex.Message}");
-                    }
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "An error occurred seeding the database with test messages. Error: {Message}", ex.Message);
                 }
             });
         }
