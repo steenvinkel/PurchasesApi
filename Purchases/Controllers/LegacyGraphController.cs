@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Business.Repositories;
-using Legacy.Repositories;
+﻿using Legacy.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
@@ -11,14 +9,11 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacyGraphController : ControllerBase
     {
-        // Postings
-        private readonly ISubCategoryRepository _subCategoryRepository;
         private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
-        public LegacyGraphController(ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
+        public LegacyGraphController(ILegacyPostingQueryRepository graphRepository)
         {
             _postingQueryRepository = graphRepository;
-            _subCategoryRepository = subCategoryRepository;
         }
 
         [HttpGet("Summary")]
@@ -33,16 +28,6 @@ namespace Purchases.Controllers
                 categories,
                 summary
             });
-        }
-
-        [HttpGet("NumDailyPurchases")]
-        public ActionResult NumDailyPurchases()
-        {
-            var userId = HttpContext.GetUserId();
-
-            var dailyPurchases = _postingQueryRepository.GetDailyPurchases(userId);
-
-            return Ok(dailyPurchases);
         }
 
         [HttpGet("MonthlyStatus")]

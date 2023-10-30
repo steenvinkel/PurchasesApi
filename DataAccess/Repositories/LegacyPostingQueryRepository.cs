@@ -18,31 +18,6 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public List<LegacyDailyNum> GetDailyPurchases(int userId)
-        {
-            var dailyPurchases = 
-                (from posting in _context.PostingForUser(userId)
-                join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                where category.Type == CategoryProperties.Type.Out
-                 group posting by new { posting.Date.Year, posting.Date.Month, posting.Date.Day } into g
-                select new
-                {
-                    g.Key.Year,
-                    g.Key.Month,
-                    g.Key.Day,
-                    Num = g.Count()
-                }).ToList().Select(dp => new LegacyDailyNum
-                {
-                    Year = dp.Year,
-                    Month = dp.Month,
-                    Day = dp.Day,
-                    NumPurchases = dp.Num
-                }).ToList();
-
-            return dailyPurchases.ToList();
-        }
-
         public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
         {
             var inTypes =

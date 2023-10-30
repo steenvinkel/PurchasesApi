@@ -6,7 +6,6 @@ namespace Legacy.Repositories
 {
     public interface ILegacyPostingQueryRepository
     {
-        List<LegacyDailyNum> GetDailyPurchases(int userId);
         List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month);
         (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, double>>>>) Summary(int userId);
         double GetMonthlyChange(int userId, MonthAndYear monthAndYear);

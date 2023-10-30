@@ -18,7 +18,7 @@ namespace DataAccess.Repositories
 
         public List<LegacyAccountStatus> Post(List<LegacyAccountStatus> accountStatuses, int userId)
         {
-            List<AccountStatus> newAccountStatuses = new List<AccountStatus>();
+            var newAccountStatuses = new List<AccountStatus>();
             foreach(var accountStatus in accountStatuses)
             {
                 var newAccountStatus = new AccountStatus
