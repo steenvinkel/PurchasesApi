@@ -1,10 +1,8 @@
 ﻿using Business.Services;
-using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Purchases.Helpers;
 using System;
-using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 

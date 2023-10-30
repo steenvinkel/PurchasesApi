@@ -1,5 +1,4 @@
-﻿using AutoFixture;
-using Business.Services;
+﻿using Business.Services;
 using NUnit.Framework;
 using System;
 
