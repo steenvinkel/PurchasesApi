@@ -32,21 +32,20 @@ namespace Business.Services
         {
             var (AuthToken, Password) = _userRepository.GetAuthTokenAndPasswordByUsername(username) ?? throw new UnauthorizedAccessException();
 
-            using (SHA512 shaM = SHA512.Create())
+            var data = Encoding.UTF8.GetBytes(password);
+            var hash = SHA512.HashData(data);
+
+            var hashedInputStringBuilder = new StringBuilder(128);
+            foreach (var b in hash)
             {
-                var data = Encoding.UTF8.GetBytes(password);
-                var hash = shaM.ComputeHash(data);
+                hashedInputStringBuilder.Append(b.ToString("X2"));
+            }
 
-                var hashedInputStringBuilder = new StringBuilder(128);
-                foreach (var b in hash)
-                    hashedInputStringBuilder.Append(b.ToString("X2"));
+            var hashedPassword = hashedInputStringBuilder.ToString();
 
-                var hashedPassword = hashedInputStringBuilder.ToString();
-
-                if (hashedPassword != Password.ToUpper())
-                {
-                    throw new UnauthorizedAccessException();
-                }
+            if (hashedPassword != Password.ToUpper())
+            {
+                throw new UnauthorizedAccessException();
             }
 
             return AuthToken;
