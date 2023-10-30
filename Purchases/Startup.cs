@@ -50,7 +50,6 @@ namespace Purchases
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
             services.AddScoped<ILegacyLossRepository, LegacyLossRepository>();
             services.AddScoped<ILegacyLossService, LegacyLossService>();
-            services.AddScoped<ILegacyPostingQueryService, LegacyPostingQueryService>();
             services.AddScoped<IDashboardService, DashboardService>();
         }
 
