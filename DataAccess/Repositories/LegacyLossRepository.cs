@@ -1,4 +1,5 @@
-﻿using Business.Models;
+﻿using Business.Constants;
+using Business.Models;
 using DataAccess.Models;
 using Legacy.Repositories;
 using System;
@@ -9,17 +10,15 @@ namespace DataAccess.Repositories
     public class LegacyLossRepository : ILegacyLossRepository
     {
         private readonly PurchasesContext _context;
-        private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
-        public LegacyLossRepository(PurchasesContext context, ILegacyPostingQueryRepository postingQueryRepository)
+        public LegacyLossRepository(PurchasesContext context)
         {
             _context = context;
-            _postingQueryRepository = postingQueryRepository;
         }
 
         public void UpdateLoss(int userId, MonthAndYear monthAndYear, double loss)
         {
-            int lossSubcategoryId = _postingQueryRepository.GetLossSubCategoryId(userId);
+            int lossSubcategoryId = GetLossSubCategoryId(userId);
 
             Posting? lossPosting = GetExistingLossPosting(userId, monthAndYear, lossSubcategoryId);
 
@@ -33,6 +32,13 @@ namespace DataAccess.Repositories
             lossPosting.CreatedOn = DateTime.Now;
 
             _context.SaveChanges();
+        }
+        private int GetLossSubCategoryId(int userId)
+        {
+            return (from S in _context.Subcategory
+                    join C in _context.CategoryForUser(userId) on S.CategoryId equals C.CategoryId
+                    where C.Name == CategoryProperties.Name.Loss
+                    select S.SubcategoryId).Single();
         }
 
         private static Posting CreateNewLossPosting(int userId, MonthAndYear monthAndYear, int lossSubcategoryId)

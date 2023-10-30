@@ -117,14 +117,6 @@ namespace DataAccess.Repositories
                                 .Sum();
         }
 
-        public int GetLossSubCategoryId(int userId)
-        {
-            return (from S in _context.Subcategory
-                    join C in _context.CategoryForUser(userId) on S.CategoryId equals C.CategoryId
-                    where C.Name == CategoryProperties.Name.Loss
-                    select S.SubcategoryId).Single();
-        }
-
         public Dictionary<MonthAndYear, IncomeAndExpenses> GetMonthlyIncomeAndExpenses(int userId)
         {
             var incomeAndExpenses =
