@@ -55,20 +55,6 @@ namespace Purchases.Controllers
             return Ok(dailyPurchases);
         }
 
-        [HttpGet("MonthlyAccountStatus")]
-        public ActionResult Get()
-        {
-            var userId = HttpContext.GetUserId();
-
-            var (categories, status) = _monthlyAccountStatusRepository.MonthlyAccountStatus(userId);
-
-            return Ok(new
-            {
-                Categories = categories,
-                status
-            });
-        }
-
         [HttpGet("MonthlyStatus")]
         public ActionResult Get(int year, int month)
         {
