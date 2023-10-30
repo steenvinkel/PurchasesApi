@@ -1,4 +1,3 @@
-using Legacy;
 using NUnit.Framework;
 
 namespace Legacy.Tests

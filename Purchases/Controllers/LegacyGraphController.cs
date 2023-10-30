@@ -11,16 +11,12 @@ namespace Purchases.Controllers
     [ApiController]
     public class LegacyGraphController : ControllerBase
     {
-        // Accounts
-        private readonly ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository;
-
         // Postings
         private readonly ISubCategoryRepository _subCategoryRepository;
         private readonly ILegacyPostingQueryRepository _postingQueryRepository;
 
-        public LegacyGraphController(ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository, ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
+        public LegacyGraphController(ILegacyPostingQueryRepository graphRepository, ISubCategoryRepository subCategoryRepository)
         {
-            _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
             _postingQueryRepository = graphRepository;
             _subCategoryRepository = subCategoryRepository;
         }
