@@ -17,7 +17,7 @@ namespace Legacy.Dashboard
             _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
         }
 
-        public Dictionary<int, Dictionary<string, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
+        public Dictionary<int, Dictionary<string, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<decimal> returnRates, int currentAge, int pensionAge)
         {
             var monthlyIncomeAndExpenses = _postingQueryRepository.GetMonthlyIncomeAndExpenses(userId);
             var monthlyAccountCategorySums = _monthlyAccountStatusRepository.GetAccumulatedCategorySums(userId);
@@ -34,13 +34,13 @@ namespace Legacy.Dashboard
             return dashboards;
         }
 
-        private static DashboardInformation CalculateDashboard(MonthAndYear currentMonthAndYear, List<double> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
+        private static DashboardInformation CalculateDashboard(MonthAndYear currentMonthAndYear, List<decimal> returnRates, int currentAge, int pensionAge, int numMonths, Dictionary<MonthAndYear, Ledger> monthlyLedgers)
         {
             var ledger = CalculateAverageLedger(monthlyLedgers, numMonths, currentMonthAndYear);
             return CalculateDashboard(ledger, currentAge, pensionAge, returnRates);
         }
 
-        private static DashboardInformation CalculateDashboard(Ledger ledger, int currentAge, int pensionAge, List<double> returnRates)
+        private static DashboardInformation CalculateDashboard(Ledger ledger, int currentAge, int pensionAge, List<decimal> returnRates)
         {
             var yearToPension = pensionAge - currentAge;
 
@@ -50,8 +50,8 @@ namespace Legacy.Dashboard
 
             var dashboardInformation = new DashboardInformation
             {
-                MonthsLivableWithoutPay = Calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
-                SavingsRate = Calculator.SavingsRate(ledger.Income, ledger.Expenses),
+                MonthsLivableWithoutPay = ledger.Expenses <= 0 ? null : Calculator.CalculateMonthsLivableWithoutPay(ledger.Fortune, ledger.Expenses),
+                SavingsRate = ledger.Income == 0 ? null : Calculator.SavingsRate(ledger.Income, ledger.Expenses),
                 Fortune = ledger.Fortune,
                 InvestedFortune = ledger.InvestedFortune,
                 FireAgePerReturnRate = fireAges,

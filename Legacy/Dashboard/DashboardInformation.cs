@@ -4,16 +4,16 @@ namespace Legacy.Dashboard
 {
     public class DashboardInformation
     {
-        public required Dictionary<double, double> FireAgePerReturnRate { get; set; }
-        public double MonthsLivableWithoutPay { get; set; }
-        public double SavingsRate { get; set; }
-        public double Fortune { get; set; }
-        public double InvestedFortune { get; set; }
-        public double Income { get; set; }
-        public double Expenses { get; set; }
-        public double NetworthIncreaseFortune { get; set; }
-        public double NetworthIncreaseInvestment { get; set; }
-        public double VariableExpenses { get; set; }
-        public double FixedExpenses { get; set; }
+        public required Dictionary<decimal, decimal> FireAgePerReturnRate { get; set; }
+        public decimal? MonthsLivableWithoutPay { get; set; }
+        public decimal? SavingsRate { get; set; }
+        public decimal Fortune { get; set; }
+        public decimal InvestedFortune { get; set; }
+        public decimal Income { get; set; }
+        public decimal Expenses { get; set; }
+        public decimal NetworthIncreaseFortune { get; set; }
+        public decimal NetworthIncreaseInvestment { get; set; }
+        public decimal VariableExpenses { get; set; }
+        public decimal FixedExpenses { get; set; }
     }
 }

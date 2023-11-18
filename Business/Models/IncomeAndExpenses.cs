@@ -2,9 +2,9 @@
 {
     public class IncomeAndExpenses
     {
-        public double Income { get; set; }
-        public double Expenses { get; set; }
-        public double FixedExpenses { get; set; }
-        public double VariableExpenses { get; set; }
+        public decimal Income { get; set; }
+        public decimal Expenses { get; set; }
+        public decimal FixedExpenses { get; set; }
+        public decimal VariableExpenses { get; set; }
     }
 }

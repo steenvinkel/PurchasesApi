@@ -16,7 +16,7 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public void UpdateLoss(int userId, MonthAndYear monthAndYear, double loss)
+        public void UpdateLoss(int userId, MonthAndYear monthAndYear, decimal loss)
         {
             int lossSubcategoryId = GetLossSubCategoryId(userId);
 
