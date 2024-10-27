@@ -4,14 +4,9 @@ using Business.Repositories;
 
 namespace Business.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService(IAccountRepository accountRepository) : IAccountService
     {
-        private readonly IAccountRepository _accountRepository;
-
-        public AccountService(IAccountRepository accountRepository)
-        {
-            _accountRepository = accountRepository;
-        }
+        private readonly IAccountRepository _accountRepository = accountRepository;
 
         public List<Account> Get(int userId)
         {

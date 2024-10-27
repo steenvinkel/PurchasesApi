@@ -16,7 +16,7 @@ namespace Legacy.Tests
         {
             var result = input.ToUnderscoreCase();
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
     }
 }

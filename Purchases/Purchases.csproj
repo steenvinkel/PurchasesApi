@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReportGenerator" Version="5.1.26" />
+    <PackageReference Include="ReportGenerator" Version="5.3.11" />
   </ItemGroup>
 
   <ItemGroup>

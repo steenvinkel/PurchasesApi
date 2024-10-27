@@ -35,7 +35,7 @@ namespace IntegrationTests.Controllers
             _factory.Dispose();
         }
 
-        public static StringContent SerializeToStringContent(object obj)
+        private static StringContent SerializeToStringContent(object obj)
         {
             return new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");
         }
@@ -52,19 +52,22 @@ namespace IntegrationTests.Controllers
             var postResponse = await _client.PostAsync("/api/LegacyPosting", SerializeToStringContent(postingToSave));
             var savedPosting = await postResponse.Content.ReadAsAsync<LegacyPosting>();
 
-            // Assert
-            Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.AreEqual(postingToSave.Amount, savedPosting.Amount);
-            Assert.AreEqual(postingToSave.Date.Date, savedPosting.Date);
-            Assert.AreEqual(postingToSave.Description, savedPosting.Description);
-            Assert.AreNotEqual(0, savedPosting.Posting_id);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(savedPosting.Amount, Is.EqualTo(postingToSave.Amount));
+                Assert.That(savedPosting.Date, Is.EqualTo(postingToSave.Date.Date));
+                Assert.That(savedPosting.Description, Is.EqualTo(postingToSave.Description));
+                Assert.That(savedPosting.Posting_id, Is.Not.EqualTo(0));
+            });
 
             // Act
             var result = await _client.GetAsync("/api/LegacyPosting");
             var postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings + 1, postings.Count);
+            Assert.That(postings, Has.Count.EqualTo(NumSeededPostings + 1));
         }
 
         [Test]
@@ -75,8 +78,7 @@ namespace IntegrationTests.Controllers
             var postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings, postings.Count);
-
+            Assert.That(postings, Has.Count.EqualTo(NumSeededPostings));
 
             // Arrange
             var postingToSave = _fixture.Create<LegacyPosting>();
@@ -87,19 +89,22 @@ namespace IntegrationTests.Controllers
             var postResponse = await _client.PostAsync("/api/LegacyPosting", SerializeToStringContent(postingToSave));
             var savedPosting = await postResponse.Content.ReadAsAsync<LegacyPosting>();
 
-            // Assert
-            Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.AreEqual(postingToSave.Amount, savedPosting.Amount);
-            Assert.AreEqual(postingToSave.Date.Date, savedPosting.Date);
-            Assert.AreEqual(postingToSave.Description, savedPosting.Description);
-            Assert.AreNotEqual(0, savedPosting.Posting_id);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(savedPosting.Amount, Is.EqualTo(postingToSave.Amount));
+                Assert.That(savedPosting.Date, Is.EqualTo(postingToSave.Date.Date));
+                Assert.That(savedPosting.Description, Is.EqualTo(postingToSave.Description));
+                Assert.That(savedPosting.Posting_id, Is.Not.EqualTo(0));
+            });
 
             // Act
             result = await _client.GetAsync("/api/LegacyPosting");
             postings = await result.Content.ReadAsAsync<List<LegacyPosting>>();
 
             // Assert
-            Assert.AreEqual(NumSeededPostings + 1, postings.Count);
+            Assert.That(postings, Has.Count.EqualTo(NumSeededPostings + 1));
 
             // Arrange
             var postingToUpdate = _fixture.Create<LegacyPosting>();
@@ -110,12 +115,15 @@ namespace IntegrationTests.Controllers
             var putResponse = await _client.PutAsync("/api/LegacyPosting", SerializeToStringContent(postingToUpdate));
             var updatedPosting = await putResponse.Content.ReadAsAsync<LegacyPosting>();
 
-            // Assert
-            Assert.That(putResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.AreEqual(postingToUpdate.Amount, updatedPosting.Amount);
-            Assert.AreEqual(postingToUpdate.Date.Date, updatedPosting.Date);
-            Assert.AreEqual(postingToUpdate.Description, updatedPosting.Description);
-            Assert.AreEqual(postingToUpdate.Posting_id, updatedPosting.Posting_id);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(putResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+                Assert.That(updatedPosting.Amount, Is.EqualTo(postingToUpdate.Amount));
+                Assert.That(updatedPosting.Date, Is.EqualTo(postingToUpdate.Date.Date));
+                Assert.That(updatedPosting.Description, Is.EqualTo(postingToUpdate.Description));
+                Assert.That(updatedPosting.Posting_id, Is.EqualTo(postingToUpdate.Posting_id));
+            });
         }
     }
 }

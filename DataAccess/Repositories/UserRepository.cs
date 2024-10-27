@@ -5,14 +5,9 @@ using System.Linq;
 
 namespace DataAccess.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(PurchasesContext context) : IUserRepository
     {
-        private readonly PurchasesContext _context;
-
-        public UserRepository(PurchasesContext context)
-        {
-            _context = context;
-        }
+        private readonly PurchasesContext _context = context;
 
         public Business.Models.User? Get(string authToken)
         {

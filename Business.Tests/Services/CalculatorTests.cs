@@ -17,7 +17,7 @@ namespace Business.Tests.Services
         {
             var monthsLivable = Calculator.CalculateMonthsLivableWithoutPay(fortune, monthlyExpenses);
 
-            Assert.AreEqual(expectedMonthsLivable, monthsLivable);
+            Assert.That(monthsLivable, Is.EqualTo(expectedMonthsLivable));
         }
 
         [TestCase(10000, 15000, -50)]
@@ -32,7 +32,7 @@ namespace Business.Tests.Services
         {
             var savingsRate = Calculator.SavingsRate(income, expenses);
 
-            Assert.AreEqual(expectedSavingsRate, savingsRate);
+            Assert.That(savingsRate, Is.EqualTo(expectedSavingsRate));
         }
 
         [TestCase(20000, 15000, 300000, 0, 20, 63, 51)]
@@ -41,7 +41,7 @@ namespace Business.Tests.Services
         {
             var fireAge = Calculator.FireAge(income, expenses, fortune, returnRate, currentAge, pensionAge);
 
-            Assert.AreEqual(expectedFireAge, fireAge);
+            Assert.That(fireAge, Is.EqualTo(expectedFireAge));
         }
 
         [TestCase(20000, 15000, 30000, 0, 1, 0, 90000)]
@@ -56,7 +56,7 @@ namespace Business.Tests.Services
         {
             var amount = Calculator.CalculateLifeScenario(income, expenses, fortune, returnRate, yearsWorking, yearsNotWorking);
 
-            Assert.AreEqual(expectedAmount, Math.Round(amount));
+            Assert.That(Math.Round(amount), Is.EqualTo(expectedAmount));
         }
 
         [TestCase(5000, 30000, 0.05, 91500)]
@@ -68,7 +68,7 @@ namespace Business.Tests.Services
         {
             var amount = Calculator.SavingsAfterOneYear(monthlyChange, start, returnRate);
 
-            Assert.AreEqual(expectedAmount, amount);
+            Assert.That(amount, Is.EqualTo(expectedAmount));
         }
     }
 }

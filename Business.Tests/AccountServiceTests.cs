@@ -29,11 +29,11 @@ namespace Tests
             var accounts = _fixture.CreateMany<Account>().ToList();
             var userId = _fixture.Create<int>();
 
-            Mock.Get(_repository).Setup(r => r.Get(userId)).Returns(accounts.ToList());
+            Mock.Get(_repository).Setup(r => r.Get(userId)).Returns([.. accounts]);
 
             var result = _sut.Get(userId);
 
-            CollectionAssert.AreEquivalent(accounts, result);
+            Assert.That(result, Is.EquivalentTo(accounts));
         }
     }
 }

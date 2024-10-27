@@ -14,12 +14,11 @@ namespace Business.Tests.Dashboard
 
             var count = sut.Count;
 
-            Assert.AreEqual(0, count);
-
+            Assert.That(count, Is.EqualTo(0));
         }
 
-        private static readonly object[] FortuneAndInvestmentScenarios = new object[] 
-        {
+        private static readonly object[] FortuneAndInvestmentScenarios =
+        [
             new object[]{ new Dictionary<MonthAndYear, Dictionary<string, double>>(), new MonthAndYear(2019, 9), 0 },
             new object[]{ new Dictionary<MonthAndYear, Dictionary<string, double>>
                 { {new MonthAndYear(2019,9), new Dictionary<string, double> { {"Fortune", 2000 } } } },
@@ -33,7 +32,7 @@ namespace Business.Tests.Dashboard
                 { {new MonthAndYear(2019,9), new Dictionary<string, double> { { "Fortune", 2000 }, { "Investment", 3000 } } } },
                 new MonthAndYear(2019, 9), 5000
             },
-        };
+        ];
         [TestCaseSource(nameof(FortuneAndInvestmentScenarios))]
         public void GetFortuneAndInvestmentSummed_DifferentScenarios_ShouldReturnCorrectValue(Dictionary<MonthAndYear, Dictionary<string, double>> dictionary, MonthAndYear monthAndYear, double expectedSum)
         {
@@ -41,7 +40,7 @@ namespace Business.Tests.Dashboard
 
             var fortune = sut.GetCombinedFortune(monthAndYear);
 
-            Assert.AreEqual(expectedSum, fortune);
+            Assert.That(fortune, Is.EqualTo(expectedSum));
         }
     }
 }
