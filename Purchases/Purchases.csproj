@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.MySql" Version="8.0.1" />
     <PackageReference Include="ReportGenerator" Version="5.3.11" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿using Business.Services;
+using Business.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Purchases.Helpers;
@@ -44,7 +44,7 @@ namespace Purchases.Middleware
 
         private static bool IsAuthenticationController(HttpContext context)
         {
-            return context.Request.Path.ToString().Contains("/api/authentication");
+            return context.Request.Path.ToString().Contains("/api/authentication") || context.Request.Path.ToString().Contains("/healthz");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Business.Repositories;
 using Business.Services;
 using DataAccess.Models;
@@ -31,7 +31,9 @@ namespace Purchases
                         configure.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals | JsonNumberHandling.AllowReadingFromString
                     );
 
-            var connection = Environment.GetEnvironmentVariable("sql_connection");
+            var connection = Environment.GetEnvironmentVariable("sql_connection") ?? string.Empty;
+            services.AddHealthChecks().AddMySql(connection);
+
             services.AddDbContext<PurchasesContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0))));
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
@@ -70,6 +72,7 @@ namespace Purchases
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/healthz");
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
             });
         }

@@ -9,6 +9,7 @@ using System.Net;
 using AutoFixture;
 using System.Text;
 using System.Text.Json;
+using System;
 
 namespace IntegrationTests.Controllers
 {
@@ -22,6 +23,7 @@ namespace IntegrationTests.Controllers
         [SetUp]
         public void Setup()
         {
+            Environment.SetEnvironmentVariable("sql_connection", "FakeConnection");
             _factory = new CustomWebApplicationFactory<Startup>();
             _client = _factory.CreateClient();
             _client.DefaultRequestHeaders.Add("auth_token", _factory.AuthToken);
