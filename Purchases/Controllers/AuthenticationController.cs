@@ -6,22 +6,14 @@ namespace Purchases.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController(IAuthenticationService authenticationService) : ControllerBase
     {
-        private readonly IAuthenticationService _authenticationService;
-
-        public AuthenticationController(IAuthenticationService authenticationService)
-        {
-            _authenticationService = authenticationService;
-        }
+        private readonly IAuthenticationService _authenticationService = authenticationService;
 
         [HttpGet]
         public ActionResult SaveAuthToken(string authToken)
         {
-            if (authToken == null)
-            {
-                throw new ArgumentNullException(nameof(authToken));
-            }
+            ArgumentNullException.ThrowIfNull(authToken);
 
             Response.Cookies.Append("auth_token", authToken);
 

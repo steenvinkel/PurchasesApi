@@ -2,19 +2,11 @@
 
 namespace Business.Models
 {
-    public class User
+    public class User(int userId, string username, string authToken, DateTime authExpire)
     {
-        public User(int userId, string username, string authToken, DateTime authExpire)
-        {
-            UserId = userId;
-            Username = username;
-            AuthToken = authToken;
-            AuthExpire = authExpire;
-        }
-
-        public int UserId { get; }
-        public string Username { get; }
-        public string AuthToken { get; }
-        public DateTime AuthExpire { get; }
+        public int UserId { get; } = userId;
+        public string Username { get; } = username;
+        public string AuthToken { get; } = authToken;
+        public DateTime AuthExpire { get; } = authExpire;
     }
 }

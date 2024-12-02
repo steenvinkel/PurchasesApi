@@ -21,11 +21,7 @@ namespace Purchases.Helpers
 
         public static string? GetAuthToken(this HttpContext context)
         {
-            var authToken = context.Request.Cookies["auth_token"];
-            if (authToken == null)
-            {
-                authToken = context.Request.Headers["auth_token"];
-            }
+            var authToken = context.Request.Cookies["auth_token"] ?? context.Request.Headers["auth_token"];
 
             return authToken;
         }

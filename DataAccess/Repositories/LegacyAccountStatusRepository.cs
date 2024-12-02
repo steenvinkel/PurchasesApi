@@ -7,14 +7,9 @@ using System.Linq;
 
 namespace DataAccess.Repositories
 {
-    public class LegacyAccountStatusRepository : ILegacyAccountStatusRepository
+    public class LegacyAccountStatusRepository(PurchasesContext context) : ILegacyAccountStatusRepository
     {
-        private readonly PurchasesContext _context;
-
-        public LegacyAccountStatusRepository(PurchasesContext context)
-        {
-            _context = context;
-        }
+        private readonly PurchasesContext _context = context;
 
         public List<LegacyAccountStatus> Post(List<LegacyAccountStatus> accountStatuses, int userId)
         {

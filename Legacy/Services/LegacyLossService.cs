@@ -4,20 +4,13 @@ using Legacy.Repositories;
 
 namespace Legacy.Services
 {
-    public class LegacyLossService : ILegacyLossService
+    public class LegacyLossService(ILegacyLossRepository lossRepository,
+        ILegacyPostingQueryRepository postingQueryRepository,
+        ILegacyAccountStatusQueryRepository accountStatusQueryRepository) : ILegacyLossService
     {
-        private readonly ILegacyLossRepository _lossRepository;
-        private readonly ILegacyPostingQueryRepository _postingQueryRepository;
-        private readonly ILegacyAccountStatusQueryRepository _accountStatusQueryRepository;
-
-        public LegacyLossService(ILegacyLossRepository lossRepository,
-            ILegacyPostingQueryRepository postingQueryRepository,
-            ILegacyAccountStatusQueryRepository accountStatusQueryRepository)
-        {
-            _lossRepository = lossRepository;
-            _postingQueryRepository = postingQueryRepository;
-            _accountStatusQueryRepository = accountStatusQueryRepository;
-        }
+        private readonly ILegacyLossRepository _lossRepository = lossRepository;
+        private readonly ILegacyPostingQueryRepository _postingQueryRepository = postingQueryRepository;
+        private readonly ILegacyAccountStatusQueryRepository _accountStatusQueryRepository = accountStatusQueryRepository;
 
         public void CalculateLoss(int userId, MonthAndYear monthAndYear)
         {

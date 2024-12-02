@@ -2,22 +2,13 @@
 
 namespace Legacy.Models
 {
-    public class LegacyAccountStatus
+    public class LegacyAccountStatus(int account_id, int account_status_id, double amount, int year, int month)
     {
-        public int Account_id { get; }
-        public int Account_status_id { get; }
-        public double Amount { get; }
-        public int Year { get; }
-        public int Month { get; }
-
-        public LegacyAccountStatus(int account_id, int account_status_id, double amount, int year, int month)
-        {
-            Account_id = account_id;
-            Account_status_id = account_status_id;
-            Amount = amount;
-            Year = year;
-            Month = month;
-        }
+        public int Account_id { get; } = account_id;
+        public int Account_status_id { get; } = account_status_id;
+        public double Amount { get; } = amount;
+        public int Year { get; } = year;
+        public int Month { get; } = month;
 
         public override bool Equals(object? obj)
         {

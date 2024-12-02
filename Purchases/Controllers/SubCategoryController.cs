@@ -9,14 +9,9 @@ namespace Purchases.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubCategoryController : ControllerBase
+    public class SubCategoryController(ISubCategoryRepository subCategoryRepository) : ControllerBase
     {
-        private readonly ISubCategoryRepository _subCategoryRepository;
-
-        public SubCategoryController(ISubCategoryRepository subCategoryRepository)
-        {
-            _subCategoryRepository = subCategoryRepository;
-        }
+        private readonly ISubCategoryRepository _subCategoryRepository = subCategoryRepository;
 
         [HttpGet]
         public ActionResult<List<SubCategory>> Get()

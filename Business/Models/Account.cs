@@ -1,16 +1,9 @@
 ﻿namespace Business.Models
 {
-    public class Account
+    public class Account(int accountId, string name, int accumulatedCategoryId)
     {
-        public Account(int accountId, string name, int accumulatedCategoryId)
-        {
-            AccountId = accountId;
-            Name = name;
-            AccumulatedCategoryId = accumulatedCategoryId;
-        }
-
-        public int AccountId { get; private set; }
-        public string Name { get; private set; }
-        public int AccumulatedCategoryId { get; private set; }
+        public int AccountId { get; private set; } = accountId;
+        public string Name { get; private set; } = name;
+        public int AccumulatedCategoryId { get; private set; } = accumulatedCategoryId;
     }
 }

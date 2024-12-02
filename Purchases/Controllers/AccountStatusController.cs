@@ -9,14 +9,9 @@ namespace Purchases.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountStatusController : ControllerBase
+    public class AccountStatusController(IAccountStatusRepository accountStatusRepository) : ControllerBase
     {
-        private readonly IAccountStatusRepository _accountStatusRepository;
-
-        public AccountStatusController(IAccountStatusRepository accountStatusRepository)
-        {
-            _accountStatusRepository = accountStatusRepository;
-        }
+        private readonly IAccountStatusRepository _accountStatusRepository = accountStatusRepository;
 
         [HttpGet]
         public ActionResult<List<AccountStatus>> Get()

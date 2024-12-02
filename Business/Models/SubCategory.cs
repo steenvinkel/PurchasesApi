@@ -1,18 +1,10 @@
 ﻿namespace Business.Models
 {
-    public class SubCategory
+    public class SubCategory(int id, int categoryId, string name, string? color)
     {
-        public SubCategory(int id, int categoryId, string name, string? color)
-        {
-            Id = id;
-            CategoryId = categoryId;
-            Name = name;
-            Color = color;
-        }
-
-        public int Id { get; }
-        public int CategoryId { get; }
-        public string Name { get; }
-        public string? Color { get; }
+        public int Id { get; } = id;
+        public int CategoryId { get; } = categoryId;
+        public string Name { get; } = name;
+        public string? Color { get; } = color;
     }
 }

@@ -6,16 +6,10 @@ using System.Linq;
 
 namespace Legacy.Dashboard
 {
-    public class DashboardService : IDashboardService
+    public class DashboardService(ILegacyPostingQueryRepository postingQueryRepository, ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository) : IDashboardService
     {
-        private readonly ILegacyPostingQueryRepository _postingQueryRepository;
-        private readonly ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository;
-
-        public DashboardService(ILegacyPostingQueryRepository postingQueryRepository, ILegacyAccountStatusQueryRepository monthlyAccountStatusRepository)
-        {
-            _postingQueryRepository = postingQueryRepository;
-            _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
-        }
+        private readonly ILegacyPostingQueryRepository _postingQueryRepository = postingQueryRepository;
+        private readonly ILegacyAccountStatusQueryRepository _monthlyAccountStatusRepository = monthlyAccountStatusRepository;
 
         public Dictionary<int, Dictionary<string, DashboardInformation>> GetDashboards(int userId, List<int> monthsInDashboard, bool allMonthAndYears, List<double> returnRates, int currentAge, int pensionAge)
         {

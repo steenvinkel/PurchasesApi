@@ -6,14 +6,9 @@ using System.Text;
 
 namespace Business.Services
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService(IUserRepository userRepository) : IAuthenticationService
     {
-        private readonly IUserRepository _userRepository;
-
-        public AuthenticationService(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
+        private readonly IUserRepository _userRepository = userRepository;
 
         public (int, DateTime) GetUserIdAndExpiration(string authToken)
         {
@@ -43,7 +38,7 @@ namespace Business.Services
 
             var hashedPassword = hashedInputStringBuilder.ToString();
 
-            if (hashedPassword != Password.ToUpper())
+            if (!hashedPassword.Equals(Password, StringComparison.CurrentCultureIgnoreCase))
             {
                 throw new UnauthorizedAccessException();
             }
