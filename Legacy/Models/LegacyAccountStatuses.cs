@@ -2,11 +2,11 @@
 
 namespace Legacy.Models
 {
-    public class LegacyAccountStatus(int account_id, int account_status_id, double amount, int year, int month)
+    public class LegacyAccountStatus(int account_id, int account_status_id, decimal amount, int year, int month)
     {
         public int Account_id { get; } = account_id;
         public int Account_status_id { get; } = account_status_id;
-        public double Amount { get; } = amount;
+        public decimal Amount { get; } = amount;
         public int Year { get; } = year;
         public int Month { get; } = month;
 

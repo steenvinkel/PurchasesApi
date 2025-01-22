@@ -24,7 +24,7 @@ namespace DataAccess.Repositories
             return accountCategories;
         }
 
-        private Dictionary<MonthAndYear, Dictionary<string, double>> MonthlyAccountStatus(int userId)
+        private Dictionary<MonthAndYear, Dictionary<string, decimal>> MonthlyAccountStatus(int userId)
         {
             var categoryStatuses =
                 (from mas in (from account in _context.Account
@@ -45,7 +45,7 @@ namespace DataAccess.Repositories
             return categoryStatuses;
         }
 
-        public (double StartSum, double EndSum) StartAndEndOfMonthAccountStatusSum(int userId, MonthAndYear monthAndYear)
+        public (decimal StartSum, decimal EndSum) StartAndEndOfMonthAccountStatusSum(int userId, MonthAndYear monthAndYear)
         {
             var monthlyAccountStatuses = _context.AccountStatus
                 .Where(accountStatus => accountStatus.UserId == userId)

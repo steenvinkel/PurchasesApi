@@ -9,11 +9,11 @@ namespace Business.Tests.Services
         [TestCase(10000, 40000, 4)]
         [TestCase(10000, 45000, 4.5)]
         [TestCase(5000, 100000, 20)]
-        [TestCase(-10000, 100000, double.PositiveInfinity)]
-        [TestCase(0, 100000, double.PositiveInfinity)]
+        [TestCase(-10000, 100000, null)]
+        [TestCase(0, 100000, null)]
         [TestCase(10000, -100000, 0)]
         [TestCase(5000, 0, 0)]
-        public void MonthsLivableWithoutPay(double monthlyExpenses, double fortune, double expectedMonthsLivable)
+        public void MonthsLivableWithoutPay(decimal monthlyExpenses, decimal fortune, decimal? expectedMonthsLivable)
         {
             var monthsLivable = Calculator.CalculateMonthsLivableWithoutPay(fortune, monthlyExpenses);
 
@@ -25,10 +25,10 @@ namespace Business.Tests.Services
         [TestCase(10000, 2500, 75)]
         [TestCase(10000, 9950, 0.5)]
         [TestCase(1000, 0, 100)]
-        [TestCase(0, 1000, double.NegativeInfinity)]
+        [TestCase(0, 1000, null)]
         [TestCase(1000, -1000, 0)]
         [TestCase(-1000, 1000, 0)]
-        public void SavingsRate(double income, double expenses, double expectedSavingsRate)
+        public void SavingsRate(decimal income, decimal expenses, decimal? expectedSavingsRate)
         {
             var savingsRate = Calculator.SavingsRate(income, expenses);
 
@@ -37,7 +37,7 @@ namespace Business.Tests.Services
 
         [TestCase(20000, 15000, 300000, 0, 20, 63, 51)]
         [TestCase(20000, 15000, 300000, 0.05, 20, 63, 39)]
-        public void FireAge(double income, double expenses, double fortune, double returnRate, int currentAge, int pensionAge, double expectedFireAge)
+        public void FireAge(decimal income, decimal expenses, decimal fortune, decimal returnRate, int currentAge, int pensionAge, decimal expectedFireAge)
         {
             var fireAge = Calculator.FireAge(income, expenses, fortune, returnRate, currentAge, pensionAge);
 
@@ -52,7 +52,7 @@ namespace Business.Tests.Services
         [TestCase(20000, 15000, 30000, 0, 35, 8, 690000)]
         [TestCase(20000, 15000, 30000, 0.05, 1, 42, -23631530)]
         [TestCase(20000, 15000, 30000, 0.05, 35, 8, 6532304)]
-        public void CalculateLifeScenario(double income, double expenses, double fortune, double returnRate, int yearsWorking, int yearsNotWorking, double expectedAmount)
+        public void CalculateLifeScenario(decimal income, decimal expenses, decimal fortune, decimal returnRate, int yearsWorking, int yearsNotWorking, decimal expectedAmount)
         {
             var amount = Calculator.CalculateLifeScenario(income, expenses, fortune, returnRate, yearsWorking, yearsNotWorking);
 
@@ -64,7 +64,7 @@ namespace Business.Tests.Services
         [TestCase(-5000, 90000, 0, 30000)]
         [TestCase(-5000, 30000, 0.05, -28500)]
         [TestCase(5000, 30000, -0.05, 88500)]
-        public void SavingsAfterOneYear(double monthlyChange, double start, double returnRate, double expectedAmount)
+        public void SavingsAfterOneYear(decimal monthlyChange, decimal start, decimal returnRate, decimal expectedAmount)
         {
             var amount = Calculator.SavingsAfterOneYear(monthlyChange, start, returnRate);
 
