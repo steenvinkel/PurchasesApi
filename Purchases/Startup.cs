@@ -63,6 +63,12 @@ namespace Purchases
                 app.UseHsts();
             }
 
+            app.UseCors(policy =>
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+            );
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
