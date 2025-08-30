@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Legacy.Mappers
 {
-    public class AccountStatusMapper
+    public class LegacyAccountStatusMapper
     {
         public static object Map(List<AccountStatus> accountStatuses)
         {
@@ -28,6 +28,17 @@ namespace Legacy.Mappers
             var map = yearMonthGroups.ToDictionary(group => group.Key, group => group.ToDictionary(g => g.Key, g => g.ToList()));
 
             return map;
+        }
+
+        public static LegacyAccountStatus Map(AccountStatus accountStatus)
+        {
+            return new LegacyAccountStatus(
+                accountStatus.AccountId,
+                accountStatus.AccountStatusId,
+                accountStatus.Amount,
+                accountStatus.Date.Year,
+                accountStatus.Date.Month
+            );
         }
     }
 }

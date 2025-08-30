@@ -24,5 +24,15 @@ namespace Legacy.Models
         {
             return HashCode.Combine(Account_id, Account_status_id, Amount, Year, Month);
         }
+
+        public Business.Models.AccountStatus Map()
+        {
+            return new Business.Models.AccountStatus(
+                accountStatusId: Account_status_id,
+                accountId: Account_id,
+                date: new DateTime(Year, Month, 1),
+                amount: Amount
+            );
+        }
     }
 }

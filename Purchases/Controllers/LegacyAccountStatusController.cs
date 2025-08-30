@@ -2,7 +2,6 @@
 using Business.Repositories;
 using Legacy.Mappers;
 using Legacy.Models;
-using Legacy.Repositories;
 using Legacy.Services;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
@@ -14,25 +13,17 @@ namespace Purchases.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LegacyAccountStatusController : ControllerBase
+    public class LegacyAccountStatusController(IAccountStatusRepository accountStatusRepository, ILegacyLossService lossService) : ControllerBase
     {
-        private readonly IAccountStatusRepository _accountStatusRepository;
-        private readonly ILegacyAccountStatusRepository _legacyAccountStatusRepository;
-        private readonly ILegacyLossService _lossService;
-
-        public LegacyAccountStatusController(IAccountStatusRepository accountStatusRepository, ILegacyAccountStatusRepository legacyAccountStatusRepository, ILegacyLossService lossService)
-        {
-            _accountStatusRepository = accountStatusRepository;
-            _legacyAccountStatusRepository = legacyAccountStatusRepository;
-            _lossService = lossService;
-        }
+        private readonly IAccountStatusRepository _accountStatusRepository = accountStatusRepository;
+        private readonly ILegacyLossService _lossService = lossService;
 
         [HttpGet]
         public ActionResult<object> Get()
         {
             var accountStatuses = _accountStatusRepository.Get(HttpContext.GetUserId());
 
-            return AccountStatusMapper.Map(accountStatuses);
+            return LegacyAccountStatusMapper.Map(accountStatuses);
         }
 
         [HttpPost]
@@ -43,12 +34,12 @@ namespace Purchases.Controllers
 
             var userId = HttpContext.GetUserId();
 
-            var newAccountStatuses = _legacyAccountStatusRepository.Post(accountStatuses, userId);
+            var newAccountStatuses = _accountStatusRepository.Add(userId, accountStatuses.Select(a => a.Map()).ToList());
 
             var monthAndYear = new MonthAndYear(accountStatuses.First().Year, accountStatuses.First().Month);
             _lossService.CalculateLoss(userId, monthAndYear);
 
-            return Ok(newAccountStatuses);
+            return Ok(newAccountStatuses.Select(LegacyAccountStatusMapper.Map));
         }
 
         [HttpPut]
@@ -58,12 +49,12 @@ namespace Purchases.Controllers
             accountStatuses.ForEach(ValidatePut);
             var userId = HttpContext.GetUserId();
 
-            var existingAccountStatuses = _legacyAccountStatusRepository.Put(accountStatuses, userId);
+            var existingAccountStatuses = _accountStatusRepository.Update(userId, accountStatuses.Select(a => a.Map()).ToList());
 
             var monthAndYear = new MonthAndYear(accountStatuses.First().Year, accountStatuses.First().Month);
             _lossService.CalculateLoss(userId, monthAndYear);
 
-            return Ok(existingAccountStatuses);
+            return Ok(existingAccountStatuses.Select(LegacyAccountStatusMapper.Map));
         }
 
         private static void ValidateNotEmpty(List<LegacyAccountStatus> accountStatuses)

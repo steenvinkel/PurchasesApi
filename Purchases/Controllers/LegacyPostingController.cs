@@ -1,29 +1,31 @@
-﻿using Legacy.Models;
+﻿using Business.Repositories;
+using Legacy.Models;
 using Legacy.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Purchases.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Purchases.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LegacyPostingController : ControllerBase
+    public class LegacyPostingController(IPostingRepository postingRepository, ISubCategoryRepository subCategoryRepository) : ControllerBase
     {
-        private readonly ILegacyPostingRepository _postingRepository;
-
-        public LegacyPostingController(ILegacyPostingRepository postingRepository)
-        {
-            _postingRepository = postingRepository;
-        }
+        private readonly IPostingRepository _postingRepository = postingRepository;
+        private readonly ISubCategoryRepository _subCategoryRepository = subCategoryRepository;
 
         [HttpGet]
         public ActionResult<List<LegacyPosting>> Get()
         {
-            var postings = _postingRepository.Get(HttpContext.GetUserId());
-            return Ok(postings);
+            var userId = HttpContext.GetUserId();
+            var existing = _postingRepository.Get(userId);
+
+            var subcategoryIdMap = _subCategoryRepository.GetList(userId).ToDictionary(s => s.SubCategoryId, s => s.Name);
+
+            return Ok(existing.Select(posting => LegacyPosting.Map(posting, subcategoryIdMap)));
         }
 
         [HttpPut]
@@ -32,9 +34,15 @@ namespace Purchases.Controllers
             ValidatePosting(posting);
 
             var userId = HttpContext.GetUserId();
-            var newPosting = _postingRepository.Put(posting, userId);
 
-            return Ok(newPosting);
+            var subcategories = _subCategoryRepository.GetList(userId);
+            var subcategoryNameMap = subcategories.ToDictionary(s => s.Name, s => s.SubCategoryId);
+
+            var newPosting = _postingRepository.Update(userId, LegacyPosting.Map(posting, userId, subcategoryNameMap));
+
+            var subcategoryIdMap = subcategories.ToDictionary(s => s.SubCategoryId, s => s.Name);
+
+            return Ok(LegacyPosting.Map(newPosting, subcategoryIdMap));
         }
 
         [HttpPost]
@@ -47,9 +55,15 @@ namespace Purchases.Controllers
             ValidatePosting(posting);
 
             var userId = HttpContext.GetUserId();
-            var newPosting = _postingRepository.Post(posting, userId);
 
-            return Ok(newPosting);
+            var subcategories = _subCategoryRepository.GetList(userId);
+            var subcategoryNameMap = subcategories.ToDictionary(s => s.Name, s => s.SubCategoryId);
+
+            var newPosting = _postingRepository.Add(userId, LegacyPosting.Map(posting, userId, subcategoryNameMap));
+
+            var subcategoryIdMap = subcategories.ToDictionary(s => s.SubCategoryId, s => s.Name);
+
+            return Ok(LegacyPosting.Map(newPosting, subcategoryIdMap));
         }
 
         private static void ValidatePosting(LegacyPosting posting)

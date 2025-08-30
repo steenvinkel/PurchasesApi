@@ -1,5 +1,4 @@
 ﻿using Business.Constants;
-using Business.Models;
 using DataAccess.Models;
 using Legacy.Repositories;
 using System;
@@ -16,7 +15,7 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public void UpdateLoss(int userId, MonthAndYear monthAndYear, decimal loss)
+        public void UpdateLoss(int userId, Business.Models.MonthAndYear monthAndYear, decimal loss)
         {
             int lossSubcategoryId = GetLossSubCategoryId(userId);
 
@@ -41,7 +40,7 @@ namespace DataAccess.Repositories
                     select S.SubcategoryId).Single();
         }
 
-        private static Posting CreateNewLossPosting(int userId, MonthAndYear monthAndYear, int lossSubcategoryId)
+        private static Posting CreateNewLossPosting(int userId, Business.Models.MonthAndYear monthAndYear, int lossSubcategoryId)
         {
             return new Posting
             {
@@ -54,7 +53,7 @@ namespace DataAccess.Repositories
             };
         }
 
-        private Posting? GetExistingLossPosting(int userId, MonthAndYear monthAndYear, int lossSubcategoryId)
+        private Posting? GetExistingLossPosting(int userId, Business.Models.MonthAndYear monthAndYear, int lossSubcategoryId)
         {
             return _context.PostingForUser(userId)
                 .Where(posting => posting.Date.Year == monthAndYear.Year)

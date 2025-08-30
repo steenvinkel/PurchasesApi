@@ -38,11 +38,10 @@ namespace Purchases
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountStatusRepository, AccountStatusRepository>();
-            services.AddScoped<ILegacyPostingRepository, LegacyPostingRepository>();
+            services.AddScoped<IPostingRepository, PostingRepository>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ILegacyAccountStatusQueryRepository, LegacyMonthlyAccountStatusRepository>();
-            services.AddScoped<ILegacyAccountStatusRepository, LegacyAccountStatusRepository>();
             services.AddScoped<ILegacyPostingQueryRepository, LegacyPostingQueryRepository>();
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
             services.AddScoped<ILegacyLossRepository, LegacyLossRepository>();

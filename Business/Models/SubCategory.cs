@@ -2,7 +2,7 @@
 {
     public class SubCategory(int id, int categoryId, string name, string? color)
     {
-        public int Id { get; } = id;
+        public int SubCategoryId { get; } = id;
         public int CategoryId { get; } = categoryId;
         public string Name { get; } = name;
         public string? Color { get; } = color;
