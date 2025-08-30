@@ -7,10 +7,5 @@
             public const string In = "in";
             public const string Out = "out";
         }
-
-        public static class Name
-        {
-            public const string Loss = "Tab";
-        }
     }
 }

@@ -21,7 +21,7 @@ namespace Purchases.Controllers
         public ActionResult<List<LegacyPosting>> Get()
         {
             var userId = HttpContext.GetUserId();
-            var existing = _postingRepository.Get(userId);
+            var existing = _postingRepository.Get200Descending(userId);
 
             var subcategoryIdMap = _subCategoryRepository.GetList(userId).ToDictionary(s => s.SubCategoryId, s => s.Name);
 

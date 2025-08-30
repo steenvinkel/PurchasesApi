@@ -10,9 +10,16 @@ namespace DataAccess.Repositories
     {
         private readonly PurchasesContext _context = context;
 
-        public IEnumerable<Business.Models.Posting> Get(int userId)
+        public IEnumerable<Business.Models.Posting> Get200Descending(int userId)
         {
-            var postings = _context.PostingForUser(userId).OrderByDescending(p => p.CreatedOn).Take(200).ToList();
+            var postings = _context.PostingForUser(userId).OrderByDescending(p => p.UpdatedOn).Take(200).ToList();
+
+            return postings.Select(Map);
+        }
+
+        public IEnumerable<Business.Models.Posting> GetAllForSubcategory(int userId, int subcategoryId)
+        {
+            var postings = _context.PostingForUser(userId).Where(p => p.SubcategoryId == subcategoryId).ToList();
 
             return postings.Select(Map);
         }

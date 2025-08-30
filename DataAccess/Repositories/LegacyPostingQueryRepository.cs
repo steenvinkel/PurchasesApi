@@ -112,7 +112,7 @@ namespace DataAccess.Repositories
                     join C in _context.Category on S.CategoryId equals C.CategoryId
                     where  P.Date.Year == monthAndYear.Year
                         && P.Date.Month == monthAndYear.Month
-                        && C.Name != CategoryProperties.Name.Loss
+                        && S.Name != SubCategoryProperties.Name.Loss
                     select C.Type == CategoryProperties.Type.In ? P.Amount : -P.Amount)
                                 .Sum();
         }

@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Linq;
 using Business.Models;
+using Business.Repositories;
 using Legacy.Repositories;
 
 namespace Legacy.Services
 {
-    public class LegacyLossService(ILegacyLossRepository lossRepository,
-        ILegacyPostingQueryRepository postingQueryRepository,
-        ILegacyAccountStatusQueryRepository accountStatusQueryRepository) : ILegacyLossService
+    public class LegacyLossService(ILegacyPostingQueryRepository postingQueryRepository,
+        ILegacyAccountStatusQueryRepository accountStatusQueryRepository,
+        ISubCategoryRepository subCategoryRepository,
+        IPostingRepository postingRepository) : ILegacyLossService
     {
-        private readonly ILegacyLossRepository _lossRepository = lossRepository;
         private readonly ILegacyPostingQueryRepository _postingQueryRepository = postingQueryRepository;
         private readonly ILegacyAccountStatusQueryRepository _accountStatusQueryRepository = accountStatusQueryRepository;
+        private readonly ISubCategoryRepository _subCategoryRepository = subCategoryRepository;
+        private readonly IPostingRepository _postingRepository = postingRepository;
 
         public void CalculateLoss(int userId, MonthAndYear monthAndYear)
         {
@@ -19,7 +23,33 @@ namespace Legacy.Services
 
             var loss = Math.Round(monthlyChange + startSum - endSum, 2);
 
-            _lossRepository.UpdateLoss(userId, monthAndYear, loss);
+            UpdateLoss(userId, monthAndYear, loss);
+        }
+
+        private void UpdateLoss(int userId, MonthAndYear monthAndYear, decimal loss)
+        {
+            var lossSubCategoryId = _subCategoryRepository.GetList(userId)
+                .Where(s => s.Name == Business.Constants.SubCategoryProperties.Name.Loss)
+                .Select(s => s.SubCategoryId)
+                .Single();
+
+            var lossPosting = _postingRepository.GetAllForSubcategory(userId, lossSubCategoryId)
+                .Where(posting => posting.Date.Year == monthAndYear.Year)
+                .Where(posting => posting.Date.Month == monthAndYear.Month)
+                .SingleOrDefault();
+
+            if (lossPosting == null)
+            {
+                lossPosting = new Posting(0, userId, lossSubCategoryId, loss, monthAndYear.LastDayOfMonth());
+
+                _postingRepository.Add(userId, lossPosting);
+            }
+            else
+            {
+                lossPosting.Amount = loss;
+
+                _postingRepository.Update(userId, lossPosting);
+            }
         }
     }
 }

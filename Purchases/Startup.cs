@@ -44,7 +44,6 @@ namespace Purchases
             services.AddScoped<ILegacyAccountStatusQueryRepository, LegacyMonthlyAccountStatusRepository>();
             services.AddScoped<ILegacyPostingQueryRepository, LegacyPostingQueryRepository>();
             services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
-            services.AddScoped<ILegacyLossRepository, LegacyLossRepository>();
             services.AddScoped<ILegacyLossService, LegacyLossService>();
             services.AddScoped<IDashboardService, DashboardService>();
         }
