@@ -6,8 +6,10 @@ namespace Business.Repositories
     public interface IPostingRepository
     {
         IEnumerable<Posting> Get200Descending(int userId);
+        IEnumerable<Posting> Get(int userId);
         Posting Add(int userId, Posting posting);
         Posting Update(int userId, Posting posting);
         IEnumerable<Posting> GetAllForSubcategory(int userId, int subcategoryId);
+        void Delete(int userId, int postingId);
     }
 }

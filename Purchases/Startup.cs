@@ -71,6 +71,8 @@ namespace Purchases
 
             app.UseRouting();
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseAuthorization();
             app.UseMiddleware<CustomAuthenticationMiddleware>();
 

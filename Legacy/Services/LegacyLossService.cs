@@ -40,7 +40,7 @@ namespace Legacy.Services
 
             if (lossPosting == null)
             {
-                lossPosting = new Posting(0, userId, lossSubCategoryId, loss, monthAndYear.LastDayOfMonth());
+                lossPosting = new Posting(0, lossSubCategoryId, loss, monthAndYear.LastDayOfMonth());
 
                 _postingRepository.Add(userId, lossPosting);
             }

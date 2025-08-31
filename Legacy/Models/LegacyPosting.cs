@@ -34,7 +34,7 @@ namespace Legacy.Models
         {
             var subcategoryId = subcategoryIdMap[posting.Description];
 
-            return new Posting(posting.Posting_id, userId, subcategoryId, posting.Amount, posting.Date);
+            return new Posting(posting.Posting_id, subcategoryId, posting.Amount, posting.Date);
         }
     }
 }

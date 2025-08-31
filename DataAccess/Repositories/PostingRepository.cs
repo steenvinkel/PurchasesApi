@@ -1,4 +1,5 @@
-﻿using Business.Repositories;
+﻿using Business.Exceptions;
+using Business.Repositories;
 using DataAccess.Models;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,13 @@ namespace DataAccess.Repositories
     public class PostingRepository(PurchasesContext context) : IPostingRepository
     {
         private readonly PurchasesContext _context = context;
+
+        public IEnumerable<Business.Models.Posting> Get(int userId)
+        {
+            var postings = _context.PostingForUser(userId).ToList();
+
+            return postings.Select(Map);
+        }
 
         public IEnumerable<Business.Models.Posting> Get200Descending(int userId)
         {
@@ -51,13 +59,21 @@ namespace DataAccess.Repositories
             return Map(updatedPosting);
         }
 
+        public void Delete(int userId, int postingId)
+        {
+            var posting = _context.PostingForUser(userId).SingleOrDefault(p => p.PostingId == postingId) ?? throw new NotFoundException($"Could not find Posting with id: {postingId}");
+
+            _context.Posting.Remove(posting);
+            _context.SaveChanges();
+        }
+
         private Business.Models.Posting Map(Posting posting)
         {
             if (!posting.SubcategoryId.HasValue)
             {
                 throw new ArgumentNullException(nameof(posting.SubcategoryId));
             }
-            return new Business.Models.Posting(posting.PostingId, posting.UserId, posting.SubcategoryId.Value, posting.Amount, posting.Date);     
+            return new Business.Models.Posting(posting.PostingId, posting.SubcategoryId.Value, posting.Amount, posting.Date);
         }
     }
 }

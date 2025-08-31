@@ -14,6 +14,7 @@ namespace Purchases.IntegrationTests
     {
         public string AuthToken { get; private set; }
         public string SubCategoryName { get; private set; }
+        public int SubCategoryId { get; private set; }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -65,6 +66,7 @@ namespace Purchases.IntegrationTests
                     subcategory.CategoryId = category.CategoryId;
                     db.Subcategory.Add(subcategory);
                     SubCategoryName = subcategory.Name;
+                    SubCategoryId = subcategory.SubcategoryId;
 
                     var posting = fixture.Create<Posting>();
                     posting.Amount = 10000;
