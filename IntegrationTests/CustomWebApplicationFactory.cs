@@ -6,31 +6,40 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using AutoFixture;
+using System.Linq;
+using Microsoft.Extensions.Hosting;
 
 namespace Purchases.IntegrationTests
 {
-    public class CustomWebApplicationFactory<TStartup>
-    : WebApplicationFactory<TStartup> where TStartup : class
+    public class CustomWebApplicationFactory
+    : WebApplicationFactory<Program>
     {
         public string AuthToken { get; private set; }
         public string SubCategoryName { get; private set; }
         public int SubCategoryId { get; private set; }
 
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            // Prevent the real app from running its Run() call
+            builder.UseEnvironment("Testing");
+            return base.CreateHost(builder);
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
             {
-                // Create a new service provider.
-                var serviceProvider = new ServiceCollection()
-                    .AddEntityFrameworkInMemoryDatabase()
-                    .BuildServiceProvider();
+                // Remove existing DbContext registration (if any)
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<PurchasesContext>));
+                if (descriptor != null)
+                    services.Remove(descriptor);
 
                 // Add a database context (ApplicationDbContext) using an in-memory 
                 // database for testing.
                 services.AddDbContext<PurchasesContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
-                    options.UseInternalServiceProvider(serviceProvider);
                 });
 
                 // Build the service provider.
@@ -43,7 +52,7 @@ namespace Purchases.IntegrationTests
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<PurchasesContext>();
                 var logger = scopedServices
-                    .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                    .GetRequiredService<ILogger<CustomWebApplicationFactory>>();
 
                 // Ensure the database is created.
                 db.Database.EnsureCreated();

@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using Purchases;
 using Purchases.IntegrationTests;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,7 +15,7 @@ namespace IntegrationTests.Controllers
 {
     public class PostingControllerTests
     {
-        private CustomWebApplicationFactory<Startup> _factory;
+        private CustomWebApplicationFactory _factory;
         private HttpClient _client;
         private Fixture _fixture;
         private const int NumSeededPostings = 2;
@@ -25,7 +24,7 @@ namespace IntegrationTests.Controllers
         public void Setup()
         {
             Environment.SetEnvironmentVariable("sql_connection", "FakeConnection");
-            _factory = new CustomWebApplicationFactory<Startup>();
+            _factory = new CustomWebApplicationFactory();
             _client = _factory.CreateClient();
             _client.DefaultRequestHeaders.Add("auth_token", _factory.AuthToken);
             _fixture = new Fixture();
@@ -45,6 +44,7 @@ namespace IntegrationTests.Controllers
 
         [Test]
         public async Task SavePostingWithNoAmount_Fail()
+
         {
             // Arrange
             var postingToSave = _fixture.Create<Posting>();
