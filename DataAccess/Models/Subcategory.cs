@@ -2,7 +2,7 @@
 
 namespace DataAccess.Models
 {
-    public partial class Subcategory
+    public partial class SubCategory
     {
         public int SubcategoryId { get; set; }
         public int CategoryId { get; set; }

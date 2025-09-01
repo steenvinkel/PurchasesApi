@@ -8,7 +8,7 @@ namespace Business.Services
     {
         private readonly IAccountRepository _accountRepository = accountRepository;
 
-        public List<Account> Get(int userId)
+        public List<AccountDAO> Get(int userId)
         {
             return _accountRepository.Get(userId);
         }

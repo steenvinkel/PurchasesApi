@@ -5,8 +5,8 @@ namespace Business.Repositories
 {
     public interface IAccountStatusRepository
     {
-        List<AccountStatus> Get(int userId);
-        List<AccountStatus> Add(int userId, List<AccountStatus> accountStatuses);
-        List<AccountStatus> Update(int userId, List<AccountStatus> updatedAccountStatuses);
+        List<AccountStatusDAO> Get(int userId);
+        List<AccountStatusDAO> Add(int userId, List<AccountStatusDAO> accountStatuses);
+        List<AccountStatusDAO> Update(int userId, List<AccountStatusDAO> updatedAccountStatuses);
     }
 }

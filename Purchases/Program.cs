@@ -12,7 +12,6 @@ using Legacy.Services;
 using Purchases.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Purchases;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +21,12 @@ builder.Services.AddMemoryCache();
 // Controllers & JSON options
 builder.Services.AddControllers()
     .AddJsonOptions(configure =>
+    {
         configure.JsonSerializerOptions.NumberHandling =
             JsonNumberHandling.AllowNamedFloatingPointLiterals |
-            JsonNumberHandling.AllowReadingFromString
-    );
+            JsonNumberHandling.AllowReadingFromString;
+        configure.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Health checks
 var connection = Environment.GetEnvironmentVariable("sql_connection") ?? string.Empty;
@@ -48,6 +49,7 @@ builder.Services.AddScoped<ILegacyPostingQueryRepository, LegacyPostingQueryRepo
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 builder.Services.AddScoped<ILegacyLossService, LegacyLossService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

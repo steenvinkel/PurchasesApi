@@ -15,14 +15,14 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public List<Business.Models.AccountStatus> Get(int userId)
+        public List<Business.Models.AccountStatusDAO> Get(int userId)
         {
             var accountStatuses = _context.AccountStatus.Where(accountStatus => accountStatus.UserId == userId).ToList();
 
             return accountStatuses.Select(Map).ToList();
         }
 
-        public List<Business.Models.AccountStatus> Add(int userId, List<Business.Models.AccountStatus> accountStatuses)
+        public List<Business.Models.AccountStatusDAO> Add(int userId, List<Business.Models.AccountStatusDAO> accountStatuses)
         {
             var newAccountStatuses = new List<AccountStatus>();
             foreach(var accountStatus in accountStatuses)
@@ -37,7 +37,7 @@ namespace DataAccess.Repositories
             return newAccountStatuses.Select(Map).ToList();
         }
 
-        public List<Business.Models.AccountStatus> Update(int userId, List<Business.Models.AccountStatus> updatedAccountStatuses)
+        public List<Business.Models.AccountStatusDAO> Update(int userId, List<Business.Models.AccountStatusDAO> updatedAccountStatuses)
         {
             var ids = updatedAccountStatuses.Select(a => a.AccountStatusId).ToList();
             List<AccountStatus> existingAccountStatuses = _context.AccountStatus
@@ -64,7 +64,7 @@ namespace DataAccess.Repositories
             return existingAccountStatuses.Select(Map).ToList();
         }
 
-        private AccountStatus CreateNewAccountStatus(Business.Models.AccountStatus accountStatus, int userId)
+        private AccountStatus CreateNewAccountStatus(Business.Models.AccountStatusDAO accountStatus, int userId)
         {
             return new AccountStatus
             {
@@ -76,9 +76,9 @@ namespace DataAccess.Repositories
             };
         }
 
-        private Business.Models.AccountStatus Map(AccountStatus a)
+        private Business.Models.AccountStatusDAO Map(AccountStatus a)
         {
-            return new Business.Models.AccountStatus(a.AccountStatusId, a.AccountId, a.Date, a.Amount);
+            return new Business.Models.AccountStatusDAO(a.AccountStatusId, a.AccountId, a.Date, a.Amount);
         }
     }
 }

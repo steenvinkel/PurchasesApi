@@ -12,14 +12,14 @@ namespace Business.Services
 
         public (int, DateTime) GetUserIdAndExpiration(string authToken)
         {
-            var user = _userRepository.Get(authToken) ?? throw new AuthenticationException($"The authentication token ({authToken}) is invalid");
+            var (userId, authExpire) = _userRepository.Get(authToken) ?? throw new AuthenticationException($"The authentication token ({authToken}) is invalid");
 
-            if (user.AuthExpire < DateTime.Now)
+            if (authExpire < DateTime.Now)
             {
                 throw new AuthenticationException("Authentication token has expired");
             }
 
-            return (user.UserId, user.AuthExpire);
+            return (userId, authExpire);
 
         }
 

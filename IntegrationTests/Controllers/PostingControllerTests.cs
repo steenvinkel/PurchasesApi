@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Purchases;
 using Purchases.IntegrationTests;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -44,7 +45,6 @@ namespace IntegrationTests.Controllers
 
         [Test]
         public async Task SavePostingWithNoAmount_Fail()
-
         {
             // Arrange
             var postingToSave = _fixture.Create<Posting>();

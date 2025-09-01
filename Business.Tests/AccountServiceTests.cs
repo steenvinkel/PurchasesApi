@@ -26,7 +26,7 @@ namespace Tests
         [Test]
         public void WhenDatabaseHasAccountList_ReturnTheList()
         {
-            var accounts = _fixture.CreateMany<Account>().ToList();
+            var accounts = _fixture.CreateMany<AccountDAO>().ToList();
             var userId = _fixture.Create<int>();
 
             Mock.Get(_repository).Setup(r => r.Get(userId)).Returns([.. accounts]);

@@ -5,6 +5,6 @@ namespace Business.Services
 {
     public interface IAccountService
     {
-        List<Account> Get(int userId);
+        List<AccountDAO> Get(int userId);
     }
 }

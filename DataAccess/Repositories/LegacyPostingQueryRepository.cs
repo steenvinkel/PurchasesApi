@@ -1,4 +1,5 @@
 ﻿using Business.Constants;
+using DataAccess.Constants;
 using Business.Models;
 using DataAccess.Models;
 using Legacy.Models;
@@ -22,7 +23,7 @@ namespace DataAccess.Repositories
         {
             var inTypes =
                        (from posting in _context.PostingForUser(userId)
-                        join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                        join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
                         join category in _context.Category on subcategory.CategoryId equals category.CategoryId
                         where category.Type == CategoryProperties.Type.In
                              && posting.Date.Year == year && posting.Date.Month == month
@@ -42,7 +43,7 @@ namespace DataAccess.Repositories
 
             var outTypes =
                        (from posting in _context.PostingForUser(userId)
-                       join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                       join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
                        where category.Type == CategoryProperties.Type.Out
                             && posting.Date.Year == year && posting.Date.Month == month
@@ -81,7 +82,7 @@ namespace DataAccess.Repositories
 
             var summary =
                 (from posting in _context.PostingForUser(userId)
-                 join subcategory in _context.Subcategory on posting.SubcategoryId equals subcategory.SubcategoryId
+                 join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
                  join category in _context.Category on subcategory.CategoryId equals category.CategoryId
                  group posting.Amount by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId, category.CategoryId } into g
                  select new {
@@ -108,11 +109,11 @@ namespace DataAccess.Repositories
         public decimal GetMonthlyChange(int userId, MonthAndYear monthAndYear)
         {
             return (from P in _context.PostingForUser(userId)
-                    join S in _context.Subcategory on P.SubcategoryId equals S.SubcategoryId
+                    join S in _context.SubCategory on P.SubcategoryId equals S.SubcategoryId
                     join C in _context.Category on S.CategoryId equals C.CategoryId
                     where  P.Date.Year == monthAndYear.Year
                         && P.Date.Month == monthAndYear.Month
-                        && S.Name != SubCategoryProperties.Name.Loss
+                        && S.Name != Business.Constants.SubCategoryProperties.Name.Loss
                     select C.Type == CategoryProperties.Type.In ? P.Amount : -P.Amount)
                                 .Sum();
         }
@@ -121,7 +122,7 @@ namespace DataAccess.Repositories
         {
             var incomeAndExpenses =
                 (from p in _context.PostingForUser(userId)
-                 join s in _context.Subcategory on p.SubcategoryId equals s.SubcategoryId
+                 join s in _context.SubCategory on p.SubcategoryId equals s.SubcategoryId
                  join c in _context.Category on s.CategoryId equals c.CategoryId
                  group p.Amount by new { p.Date.Year, p.Date.Month, c.Type, SubType = s.Type } into g
                  select new

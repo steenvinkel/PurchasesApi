@@ -1,4 +1,4 @@
-﻿namespace Business.Constants
+﻿namespace DataAccess.Constants
 {
     public static class CategoryProperties
     {

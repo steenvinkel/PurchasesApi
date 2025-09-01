@@ -14,7 +14,7 @@ namespace Purchases.Controllers
         private readonly IAccountService _accountService = accountService;
 
         [HttpGet]
-        public ActionResult<List<Account>> Get()
+        public ActionResult<List<AccountDAO>> Get()
         {
             return _accountService.Get(HttpContext.GetUserId());
         }

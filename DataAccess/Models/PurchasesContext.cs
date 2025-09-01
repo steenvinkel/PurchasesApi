@@ -18,7 +18,7 @@ namespace DataAccess.Models
         public virtual DbSet<AccumulatedCategory> AccumulatedCategory { get; set; }
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Posting> Posting { get; set; }
-        public virtual DbSet<Subcategory> Subcategory { get; set; }
+        public virtual DbSet<SubCategory> SubCategory { get; set; }
         public virtual DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -188,7 +188,7 @@ namespace DataAccess.Models
                     .HasColumnType("int(11)");
             });
 
-            modelBuilder.Entity<Subcategory>(entity =>
+            modelBuilder.Entity<SubCategory>(entity =>
             {
                 entity.ToTable("subcategory");
 

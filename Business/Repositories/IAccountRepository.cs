@@ -5,6 +5,7 @@ namespace Business.Repositories
 {
     public interface IAccountRepository
     {
-        List<Account> Get(int userId);
+        List<AccountDAO> Get(int userId);
+        List<Account> GetAccounts(int userId);
     }
 }

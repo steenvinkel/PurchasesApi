@@ -14,7 +14,7 @@ namespace Purchases.Controllers
         private readonly IAccountStatusRepository _accountStatusRepository = accountStatusRepository;
 
         [HttpGet]
-        public ActionResult<List<AccountStatus>> Get()
+        public ActionResult<List<AccountStatusDAO>> Get()
         {
             return _accountStatusRepository.Get(HttpContext.GetUserId());
         }

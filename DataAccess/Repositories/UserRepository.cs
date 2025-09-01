@@ -9,13 +9,20 @@ namespace DataAccess.Repositories
     {
         private readonly PurchasesContext _context = context;
 
-        public Business.Models.User? Get(string authToken)
+        public (int, DateTime)? Get(string authToken)
         {
             var user = _context.User.SingleOrDefault(u => u.AuthToken == authToken);
 
             return user != null
-                ? Map(user)
+                ? (user.UserId, user.AuthExpire)
                 : null;
+        }
+
+        public (int UserId, string Name) Get(int userId)
+        {
+            var user = _context.User.SingleOrDefault(u => u.UserId == userId) ?? throw new ArgumentException($"User with id {userId} does not exist");
+
+            return (user.UserId, user.Username);
         }
 
         public (string, string)? GetAuthTokenAndPasswordByUsername(string username)
@@ -25,11 +32,6 @@ namespace DataAccess.Repositories
             return user != null
                 ? (user.AuthToken, user.Password)
                 : null;
-        }
-
-        private static Business.Models.User Map(Models.User user)
-        {
-            return new Business.Models.User(user.UserId, user.Username, user.AuthToken, user.AuthExpire);
         }
 
         public void SaveAuthToken(int userId, string authToken, DateTime authExpire)
