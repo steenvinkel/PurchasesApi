@@ -65,7 +65,7 @@ namespace IntegrationTests.Controllers
                 // Asset Account
                 Assert.That(user.Accounts, Is.Not.Empty);
                 var account = user.Accounts.First();
-                Assert.That(account.AccumulatedCategoryName, Is.Not.Empty);
+                Assert.That(account.Purpose, Is.Not.Empty);
                 Assert.That(account.Statuses, Is.Not.Empty);
             });
 
