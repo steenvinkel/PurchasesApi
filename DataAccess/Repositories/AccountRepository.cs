@@ -14,13 +14,6 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public List<Business.Models.AccountDAO> Get(int userId)
-        {
-            var accounts = _context.Account.Where(account => account.UserId == userId).ToList();
-
-            return accounts.Select(Map).ToList();
-        }
-
         public List<Business.Models.Account> GetAccounts(int userId)
         {
             var accountsDao = (from type in _context.AccumulatedCategory
@@ -47,11 +40,6 @@ namespace DataAccess.Repositories
             var newAccounts = accountsDao.Select(a => new Business.Models.Account(a.AccountId, a.Name, a.Type, accountToStatusesMap[a.AccountId])).ToList();
 
             return newAccounts;
-        }
-
-        private Business.Models.AccountDAO Map(Account account)
-        {
-            return new Business.Models.AccountDAO(account.AccountId, account.Name, account.AccumulatedCategoryId);
         }
     }
 }

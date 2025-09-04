@@ -38,7 +38,6 @@ builder.Services.AddDbContext<PurchasesContext>(options =>
 );
 
 // Dependency Injection
-builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountStatusRepository, AccountStatusRepository>();
 builder.Services.AddScoped<IPostingRepository, PostingRepository>();
