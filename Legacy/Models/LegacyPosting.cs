@@ -14,10 +14,8 @@ namespace Legacy.Models
         public decimal? Longitude { get; set; }
         public decimal? Accuracy { get; set; }
 
-        public static LegacyPosting Map(Posting posting, Dictionary<int, string> subcategoryIdMap)
+        public static LegacyPosting Map(Posting posting, string description)
         {
-            var description = subcategoryIdMap[posting.SubcategoryId];
-
             return new LegacyPosting
             {
                 Posting_id = posting.PostingId,
@@ -30,11 +28,9 @@ namespace Legacy.Models
             };
         }
 
-        public static Posting Map(LegacyPosting posting, int userId, Dictionary<string, int> subcategoryIdMap)
+        public static Posting Map(LegacyPosting posting, int userId, int subCategoryId)
         {
-            var subcategoryId = subcategoryIdMap[posting.Description];
-
-            return new Posting(posting.Posting_id, subcategoryId, posting.Amount, posting.Date);
+            return new Posting(posting.Posting_id, subCategoryId, posting.Amount, posting.Date);
         }
     }
 }

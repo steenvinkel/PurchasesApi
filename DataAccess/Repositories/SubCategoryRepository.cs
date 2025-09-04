@@ -17,13 +17,14 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public List<Business.Models.SubCategory> GetList(int userId)
+        public int GetSubCategoryId(int userId, string name)
         {
             var subcategories = (from subcategory in _context.SubCategory
-                                   join category in _context.CategoryForUser(userId) on subcategory.CategoryId equals category.CategoryId
-                                   select subcategory).ToList();
+                                 join category in _context.CategoryForUser(userId) on subcategory.CategoryId equals category.CategoryId
+                                 where subcategory.Name == name
+                                 select subcategory.SubcategoryId).ToList();
 
-            return subcategories.Select(Map).ToList();
+            return subcategories.Single();
         }
 
         public List<Business.Models.CategoryBase> GetCategories(int userId)

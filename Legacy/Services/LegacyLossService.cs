@@ -28,10 +28,7 @@ namespace Legacy.Services
 
         private void UpdateLoss(int userId, MonthAndYear monthAndYear, decimal loss)
         {
-            var lossSubCategoryId = _subCategoryRepository.GetList(userId)
-                .Where(s => s.Name == Business.Constants.SubCategoryProperties.Name.Loss)
-                .Select(s => s.SubCategoryId)
-                .Single();
+            var lossSubCategoryId = _subCategoryRepository.GetSubCategoryId(userId, Business.Constants.SubCategoryProperties.Name.Loss);
 
             var lossPosting = _postingRepository.GetAllForSubcategory(userId, lossSubCategoryId)
                 .Where(posting => posting.Date.Year == monthAndYear.Year)
