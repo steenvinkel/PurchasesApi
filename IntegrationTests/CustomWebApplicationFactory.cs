@@ -8,6 +8,7 @@ using System;
 using AutoFixture;
 using System.Linq;
 using Microsoft.Extensions.Hosting;
+using Business.Constants;
 
 namespace Purchases.IntegrationTests
 {
@@ -95,6 +96,7 @@ namespace Purchases.IntegrationTests
                     subcategory2.SubcategoryId = 5;
                     subcategory2.CategoryId = category2.CategoryId;
                     subcategory2.Type = "variable";
+                    subcategory2.Name = SubCategoryProperties.Name.Loss;
                     db.SubCategory.Add(subcategory2);
 
                     var posting = fixture.Create<Posting>();
