@@ -18,13 +18,6 @@ namespace DataAccess.Repositories
             return postings.Select(Map);
         }
 
-        public IEnumerable<Business.Models.Posting> Get200Descending(int userId)
-        {
-            var postings = _context.PostingForUser(userId).OrderByDescending(p => p.UpdatedOn).Take(200).ToList();
-
-            return postings.Select(Map);
-        }
-
         public IEnumerable<Business.Models.Posting> GetAllForSubcategory(int userId, int subcategoryId)
         {
             var postings = _context.PostingForUser(userId).Where(p => p.SubcategoryId == subcategoryId).ToList();
