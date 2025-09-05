@@ -8,7 +8,7 @@ namespace Business.Models
     {
         public int PostingId { get; set; } = postingId;
         [NotZero]
-        public int SubcategoryId { get; set; } = subcategoryId;
+        public int SubCategoryId { get; set; } = subcategoryId;
         [NotZero]
         public decimal Amount { get; set; } = amount;
         [Required]

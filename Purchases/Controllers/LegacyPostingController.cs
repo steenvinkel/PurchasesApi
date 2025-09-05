@@ -24,7 +24,7 @@ namespace Purchases.Controllers
 
             var subcategoryIdMap = _subCategoryRepository.GetCategories(userId).SelectMany(c => c.Subcategories).ToDictionary(s => s.SubCategoryId, s => s.Name);
 
-            return Ok(existing.Select(posting => LegacyPosting.Map(posting, subcategoryIdMap[posting.SubcategoryId])));
+            return Ok(existing.Select(posting => LegacyPosting.Map(posting, subcategoryIdMap[posting.SubCategoryId])));
         }
 
         [HttpPut]

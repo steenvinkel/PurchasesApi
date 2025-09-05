@@ -62,7 +62,7 @@ namespace IntegrationTests.Controllers
         {
             // Arrange
             var postingToSave = _fixture.Create<Posting>();
-            postingToSave.SubcategoryId = 0;
+            postingToSave.SubCategoryId = 0;
 
             // Act
             var postResponse = await _client.PostAsync("/api/Posting", SerializeToStringContent(postingToSave));
@@ -84,7 +84,7 @@ namespace IntegrationTests.Controllers
             // Arrange
             var postingToSave = _fixture.Create<Posting>();
             postingToSave.PostingId = 0;
-            postingToSave.SubcategoryId = _factory.SubCategoryId;
+            postingToSave.SubCategoryId = _factory.SubCategoryId;
 
             // Act
             var postResponse = await _client.PostAsync("/api/Posting", SerializeToStringContent(postingToSave));
@@ -96,7 +96,7 @@ namespace IntegrationTests.Controllers
                 Assert.That(postResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
                 Assert.That(savedPosting.Amount, Is.EqualTo(postingToSave.Amount));
                 Assert.That(savedPosting.Date, Is.EqualTo(postingToSave.Date.Date));
-                Assert.That(savedPosting.SubcategoryId, Is.EqualTo(postingToSave.SubcategoryId));
+                Assert.That(savedPosting.SubCategoryId, Is.EqualTo(postingToSave.SubCategoryId));
                 Assert.That(savedPosting.PostingId, Is.Not.EqualTo(0));
             });
 
@@ -111,7 +111,7 @@ namespace IntegrationTests.Controllers
             // Arrange
             var postingToUpdate = _fixture.Create<Posting>();
             postingToUpdate.PostingId = savedPosting.PostingId;
-            postingToUpdate.SubcategoryId = _factory.SubCategoryId;
+            postingToUpdate.SubCategoryId = _factory.SubCategoryId;
 
             // Act
             var putResponse = await _client.PutAsync("/api/Posting", SerializeToStringContent(postingToUpdate));
@@ -123,7 +123,7 @@ namespace IntegrationTests.Controllers
                 Assert.That(putResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
                 Assert.That(updatedPosting.Amount, Is.EqualTo(postingToUpdate.Amount));
                 Assert.That(updatedPosting.Date, Is.EqualTo(postingToUpdate.Date.Date));
-                Assert.That(updatedPosting.SubcategoryId, Is.EqualTo(postingToUpdate.SubcategoryId));
+                Assert.That(updatedPosting.SubCategoryId, Is.EqualTo(postingToUpdate.SubCategoryId));
                 Assert.That(updatedPosting.PostingId, Is.EqualTo(postingToUpdate.PostingId));
             });
         }

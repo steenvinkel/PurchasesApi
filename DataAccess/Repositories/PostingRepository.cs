@@ -13,7 +13,7 @@ namespace DataAccess.Repositories
 
         public IEnumerable<Business.Models.Posting> Get(int userId)
         {
-            var postings = _context.PostingForUser(userId).ToList();
+            var postings = _context.PostingForUser(userId).OrderByDescending(p => p.UpdatedOn).ToList();
 
             return postings.Select(Map);
         }
@@ -37,7 +37,7 @@ namespace DataAccess.Repositories
             var newPosting = new Posting
             {
                 UserId = userId,
-                SubcategoryId = posting.SubcategoryId,
+                SubcategoryId = posting.SubCategoryId,
                 Amount = posting.Amount,
                 Date = posting.Date.Date,
                 CreatedOn = DateTime.Now
@@ -51,7 +51,7 @@ namespace DataAccess.Repositories
         public Business.Models.Posting Update(int userId, Business.Models.Posting posting)
         {
             var updatedPosting = _context.PostingForUser(userId).Single(p => p.PostingId == posting.PostingId);
-            updatedPosting.SubcategoryId = posting.SubcategoryId;
+            updatedPosting.SubcategoryId = posting.SubCategoryId;
             updatedPosting.Amount = posting.Amount;
             updatedPosting.Date = posting.Date.Date;
             _context.SaveChanges();
