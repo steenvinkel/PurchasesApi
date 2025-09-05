@@ -74,12 +74,8 @@ namespace DataAccess.Repositories
             return result;
         }
 
-        public (object, Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, decimal>>>>) Summary(int userId)
+        public Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, decimal>>>> Summary(int userId)
         {
-            var categories = _context.CategoryForUser(userId)
-                .Select(c => new { c.Name, Category_id = c.CategoryId.ToString() })
-                .ToList();
-
             var summary =
                 (from posting in _context.PostingForUser(userId)
                  join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
@@ -103,7 +99,7 @@ namespace DataAccess.Repositories
                     )
                 );
 
-            return (categories, summaryMap);
+            return summaryMap;
         }
 
         public decimal GetMonthlyChange(int userId, MonthAndYear monthAndYear)

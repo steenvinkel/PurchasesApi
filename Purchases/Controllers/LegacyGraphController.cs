@@ -21,11 +21,10 @@ namespace Purchases.Controllers
         {
             var userId = HttpContext.GetUserId();
 
-            var (categories, summary) = _postingQueryRepository.Summary(userId);
+            var summary = _postingQueryRepository.Summary(userId);
 
             return Ok(new
             {
-                categories,
                 summary
             });
         }
