@@ -35,6 +35,7 @@ namespace DataAccess.Repositories
 
             existingAccountStatus.Date = accountStatus.Date.Date;
             existingAccountStatus.Amount = accountStatus.Amount;
+            existingAccountStatus.UpdatedOn = DateTime.Now;
 
             _context.SaveChanges();
         }

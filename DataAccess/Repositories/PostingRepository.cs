@@ -47,6 +47,7 @@ namespace DataAccess.Repositories
             updatedPosting.SubcategoryId = posting.SubCategoryId;
             updatedPosting.Amount = posting.Amount;
             updatedPosting.Date = posting.Date.Date;
+            updatedPosting.UpdatedOn = DateTime.Now;
             _context.SaveChanges();
 
             return Map(updatedPosting);
