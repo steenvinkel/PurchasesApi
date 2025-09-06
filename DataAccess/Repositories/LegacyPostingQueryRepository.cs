@@ -2,7 +2,6 @@
 using DataAccess.Constants;
 using Business.Models;
 using DataAccess.Models;
-using Legacy.Models;
 using Legacy.Repositories;
 using System;
 using System.Collections.Generic;
@@ -17,89 +16,6 @@ namespace DataAccess.Repositories
         public LegacyPostingQueryRepository(PurchasesContext context)
         {
             _context = context;
-        }
-
-        public List<LegacyMonthlyTypeSumWithColorAndName> GetMonthlyStatus(int userId, int year, int month)
-        {
-            var inTypes =
-                       (from posting in _context.PostingForUser(userId)
-                        join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                        join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                        where category.Type == CategoryProperties.Type.In
-                             && posting.Date.Year == year && posting.Date.Month == month
-                        select new { posting, category, subcategory }
-                             )
-                            .ToList()
-                            .GroupBy((x) => new { x.posting.Date.Year, x.posting.Date.Month, x.subcategory.SubcategoryId })
-                            .Select(g => new
-                                {
-                                    g.Key.Year,
-                                    g.Key.Month,
-                                    g.First().category.Type,
-                                    g.First().subcategory.Name,
-                                    g.First().subcategory.Color,
-                                    Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                                });
-
-            var outTypes =
-                       (from posting in _context.PostingForUser(userId)
-                       join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                       join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                       where category.Type == CategoryProperties.Type.Out
-                            && posting.Date.Year == year && posting.Date.Month == month
-                        select new { posting, category }
-                             )
-                            .ToList()
-                            .GroupBy((x) => new { x.posting.Date.Year, x.posting.Date.Month, x.category.CategoryId })
-                            .Select(g => new
-                                {
-                                    g.Key.Year,
-                                    g.Key.Month,
-                                    g.First().category.Type,
-                                    g.First().category.Name,
-                                    g.First().category.Color,
-                                    Sum = Math.Round(g.Sum(x => x.posting.Amount), 2)
-                                });
-
-            var result = inTypes.Union(outTypes).Select(x => new LegacyMonthlyTypeSumWithColorAndName
-            {
-                Year = x.Year,
-                Month = x.Month,
-                Type = x.Type,
-                Name = x.Name,
-                Color = x.Color,
-                Sum = x.Sum
-            }).ToList();
-
-            return result;
-        }
-
-        public Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<int, decimal>>>> Summary(int userId)
-        {
-            var summary =
-                (from posting in _context.PostingForUser(userId)
-                 join subcategory in _context.SubCategory on posting.SubcategoryId equals subcategory.SubcategoryId
-                 join category in _context.Category on subcategory.CategoryId equals category.CategoryId
-                 group posting.Amount by new { posting.Date.Year, posting.Date.Month, subcategory.SubcategoryId, category.CategoryId } into g
-                 select new {
-                     g.Key.Year,
-                     g.Key.Month,
-                     g.Key.SubcategoryId,
-                     g.Key.CategoryId,
-                     Sum = g.Sum()
-                 } ).ToList();
-
-            var summaryMap = summary
-                .GroupBy(s => s.CategoryId).ToDictionary(gc => gc.Key,
-                    gc => gc.GroupBy(s => s.SubcategoryId).ToDictionary(gs => gs.Key,
-                        gs => gs.GroupBy(s => s.Year).ToDictionary(gy => gy.Key,
-                            gy => gy.GroupBy(s => s.Month).ToDictionary(gm => gm.Key, gm => gm.Sum(x => x.Sum)
-                            )
-                        )
-                    )
-                );
-
-            return summaryMap;
         }
 
         public decimal GetMonthlyChange(int userId, MonthAndYear monthAndYear)
