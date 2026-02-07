@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Business.Models;
 using Business.Repositories;
 using Legacy.Repositories;
@@ -15,15 +16,24 @@ namespace Legacy.Services
         private readonly ILegacyAccountStatusQueryRepository _accountStatusQueryRepository = accountStatusQueryRepository;
         private readonly ISubCategoryRepository _subCategoryRepository = subCategoryRepository;
         private readonly IPostingRepository _postingRepository = postingRepository;
+        private static readonly SemaphoreSlim UpdateLossSemaphore = new SemaphoreSlim(1, 1);
 
         public void CalculateLoss(int userId, MonthAndYear monthAndYear)
         {
-            var (startSum, endSum) = _accountStatusQueryRepository.StartAndEndOfMonthAccountStatusSum(userId, monthAndYear);
-            var monthlyChange = _postingQueryRepository.GetMonthlyChange(userId, monthAndYear);
+            UpdateLossSemaphore.Wait();
+            try
+            {
+                var (startSum, endSum) = _accountStatusQueryRepository.StartAndEndOfMonthAccountStatusSum(userId, monthAndYear);
+                var monthlyChange = _postingQueryRepository.GetMonthlyChange(userId, monthAndYear);
 
-            var loss = Math.Round(monthlyChange + startSum - endSum, 2);
+                var loss = Math.Round(monthlyChange + startSum - endSum, 2);
 
-            UpdateLoss(userId, monthAndYear, loss);
+                UpdateLoss(userId, monthAndYear, loss);
+            }
+            finally
+            {
+                UpdateLossSemaphore.Release();
+            }
         }
 
         private void UpdateLoss(int userId, MonthAndYear monthAndYear, decimal loss)
